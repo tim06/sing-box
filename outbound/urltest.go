@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 	"time"
+    "strings"
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/interrupt"
@@ -284,8 +285,46 @@ func (g *URLTestGroup) Close() error {
 	close(g.close)
 	return nil
 }
-
 func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+	var result adapter.Outbound
+	for _, detour := range g.outbounds {
+		tag := detour.Tag()
+		if strings.HasPrefix(tag, "auto") {
+			result, _ = g.SelectByPing(network)
+			g.logger.Debug("Use selector by ping(Defalt) selected tag: ", result.Tag())
+			break;
+		}
+	}
+	if result == nil {
+		result, _ = g.SelectByOrder(network)
+		g.logger.Debug("Use selector by order selected tag: ", result.Tag())
+	}
+	return result, result != nil
+}
+
+func (g *URLTestGroup) SelectByOrder(network string) (adapter.Outbound, bool) {
+	var selectedOutbound adapter.Outbound
+	for _, detour := range g.outbounds {
+		if !common.Contains(detour.Network(), network) {
+			continue
+		}
+
+		history := g.history.LoadURLTestHistory(RealTag(detour))
+		if history == nil {
+			continue
+		}
+
+		selectedOutbound = detour
+		break
+	}
+	if selectedOutbound == nil {
+		return nil, false
+	}
+
+	return selectedOutbound, true
+}
+
+func (g *URLTestGroup) SelectByPing(network string) (adapter.Outbound, bool) {
 	var minDelay uint16
 	var minOutbound adapter.Outbound
 	switch network {
