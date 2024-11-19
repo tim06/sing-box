@@ -66,7 +66,7 @@ func buildAndroid() {
 		"bind",
 		"-v",
 		"-androidapi", "21",
-		"-javapkg=io.nekohasekai",
+		"-javapkg=com.tim",
 		"-libname=box",
 	}
 	if !debugEnabled {
