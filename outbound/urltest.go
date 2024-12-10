@@ -291,13 +291,21 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
 		tag := detour.Tag()
 		if strings.HasPrefix(tag, "auto") {
 			result, _ = g.SelectByPing(network)
-			g.logger.Debug("Use selector by ping(Defalt) selected tag: ", result.Tag())
+			if result != nil {
+				g.logger.Debug("Use selector by ping(Defalt) selected tag: ", result.Tag())
+			} else {
+				g.logger.Debug("Use selector by ping(Defalt) ALL unavailable")
+			}
 			break;
 		}
 	}
 	if result == nil {
 		result, _ = g.SelectByOrder(network)
-		g.logger.Debug("Use selector by order selected tag: ", result.Tag())
+		if result != nil {
+			g.logger.Debug("Use selector by order selected tag: ", result.Tag())
+		} else {
+			g.logger.Debug("Use selector by order ALL unavailable")
+		}
 	}
 	return result, result != nil
 }
