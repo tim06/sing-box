@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sagernet/sing-box/cmd/sing-box/internal/convertor/adguard"
-	"github.com/sagernet/sing-box/common/srs"
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/cmd/sing-box/internal/convertor/adguard"
+	"github.com/tim06/sing-box/common/srs"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 
 	"github.com/spf13/cobra"

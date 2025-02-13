@@ -3,11 +3,11 @@ package inbound
 import (
 	"context"
 
-	"github.com/sagernet/sing-box/adapter"
-	C "github.com/sagernet/sing-box/constant"
-	"github.com/sagernet/sing-box/experimental/libbox/platform"
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/adapter"
+	C "github.com/tim06/sing-box/constant"
+	"github.com/tim06/sing-box/experimental/libbox/platform"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 )
 

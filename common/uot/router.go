@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/netip"
 
-	"github.com/sagernet/sing-box/adapter"
+	"github.com/tim06/sing-box/adapter"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"

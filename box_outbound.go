@@ -3,9 +3,9 @@ package box
 import (
 	"strings"
 
-	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/common/taskmonitor"
-	C "github.com/sagernet/sing-box/constant"
+	"github.com/tim06/sing-box/adapter"
+	"github.com/tim06/sing-box/common/taskmonitor"
+	C "github.com/tim06/sing-box/constant"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"

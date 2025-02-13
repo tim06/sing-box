@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sagernet/sing-box/cmd/internal/build_shared"
-	"github.com/sagernet/sing-box/log"
+	"github.com/tim06/sing-box/cmd/internal/build_shared"
+	"github.com/tim06/sing-box/log"
 	"github.com/sagernet/sing/common"
 
 	"howett.net/plist"

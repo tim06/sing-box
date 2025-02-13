@@ -1,7 +1,7 @@
 package deprecated
 
 import (
-	C "github.com/sagernet/sing-box/constant"
+	C "github.com/tim06/sing-box/constant"
 	F "github.com/sagernet/sing/common/format"
 
 	"golang.org/x/mod/semver"

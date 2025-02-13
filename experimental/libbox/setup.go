@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sagernet/sing-box/common/humanize"
-	C "github.com/sagernet/sing-box/constant"
-	_ "github.com/sagernet/sing-box/include"
-	"github.com/sagernet/sing-box/log"
+	"github.com/tim06/sing-box/common/humanize"
+	C "github.com/tim06/sing-box/constant"
+	_ "github.com/tim06/sing-box/include"
+	"github.com/tim06/sing-box/log"
 )
 
 var (

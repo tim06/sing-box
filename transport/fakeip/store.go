@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/netip"
 
-	"github.com/sagernet/sing-box/adapter"
+	"github.com/tim06/sing-box/adapter"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	"github.com/sagernet/sing/service"

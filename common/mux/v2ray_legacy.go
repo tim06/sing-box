@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	"github.com/sagernet/sing-box/adapter"
+	"github.com/tim06/sing-box/adapter"
 	vmess "github.com/sagernet/sing-vmess"
 	"github.com/sagernet/sing/common/logger"
 	N "github.com/sagernet/sing/common/network"

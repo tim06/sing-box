@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sagernet/sing-box/experimental/clashapi"
-	"github.com/sagernet/sing-box/experimental/clashapi/trafficontrol"
+	"github.com/tim06/sing-box/experimental/clashapi"
+	"github.com/tim06/sing-box/experimental/clashapi/trafficontrol"
 	"github.com/sagernet/sing/common/binary"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"

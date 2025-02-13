@@ -4,8 +4,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/sagernet/sing-box/adapter"
-	C "github.com/sagernet/sing-box/constant"
+	"github.com/tim06/sing-box/adapter"
+	C "github.com/tim06/sing-box/constant"
 	"github.com/sagernet/sing/common"
 	F "github.com/sagernet/sing/common/format"
 )

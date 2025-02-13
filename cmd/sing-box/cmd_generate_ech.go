@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/sagernet/sing-box/common/tls"
-	"github.com/sagernet/sing-box/log"
+	"github.com/tim06/sing-box/common/tls"
+	"github.com/tim06/sing-box/log"
 
 	"github.com/spf13/cobra"
 )

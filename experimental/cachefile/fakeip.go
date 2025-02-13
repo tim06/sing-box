@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/sagernet/bbolt"
-	"github.com/sagernet/sing-box/adapter"
-	C "github.com/sagernet/sing-box/constant"
+	"github.com/tim06/sing-box/adapter"
+	C "github.com/tim06/sing-box/constant"
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 )

@@ -6,9 +6,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/adapter"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 )
 
 var _ int = "ShadowsocksR is deprecated and removed in sing-box 1.6.0"

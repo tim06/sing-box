@@ -5,8 +5,8 @@ package tls
 import (
 	"context"
 
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 )
 
