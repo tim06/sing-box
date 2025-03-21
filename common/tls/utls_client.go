@@ -12,13 +12,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/ntp"
 	utls "github.com/sagernet/utls"
 
 	"golang.org/x/net/http2"
-
 )
 
 type UTLSClientConfig struct {
@@ -83,6 +83,7 @@ type utlsConnWrapper struct {
 
 func (c *utlsConnWrapper) ConnectionState() tls.ConnectionState {
 	state := c.Conn.ConnectionState()
+	//nolint:staticcheck
 	return tls.ConnectionState{
 		Version:                     state.Version,
 		HandshakeComplete:           state.HandshakeComplete,
@@ -141,12 +142,13 @@ func NewUTLSClient(ctx context.Context, serverAddress string, options option.Out
 		return nil, E.New("missing server_name or insecure=true")
 	}
 
-	// if options.TLSTricks != nil && options.TLSTricks.MixedCaseSNI { //выключыл решаем сервером надо допы вставлять 
+	// if options.TLSTricks != nil && options.TLSTricks.MixedCaseSNI { //выключыл решаем сервером надо допы вставлять
 	// 	serverName = randomizeCase(serverName)
 	// }
 
 	var tlsConfig utls.Config
 	tlsConfig.Time = ntp.TimeFuncFromContext(ctx)
+	tlsConfig.RootCAs = adapter.RootPoolFromContext(ctx)
 	if options.DisableSNI {
 		tlsConfig.ServerName = "127.0.0.1"
 	} else {

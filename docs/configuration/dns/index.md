@@ -2,9 +2,9 @@
 icon: material/new-box
 ---
 
-!!! quote "Changes in sing-box 1.9.0"
+!!! quote "Changes in sing-box 1.11.0"
 
-    :material-plus: [client_subnet](#client_subnet)
+    :material-plus: [cache_capacity](#cache_capacity)
 
 # DNS
 
@@ -20,6 +20,7 @@ icon: material/new-box
     "disable_cache": false,
     "disable_expire": false,
     "independent_cache": false,
+    "cache_capacity": 0,
     "reverse_mapping": false,
     "client_subnet": "",
     "fakeip": {}
@@ -48,8 +49,6 @@ Default domain strategy for resolving the domain names.
 
 One of `prefer_ipv4` `prefer_ipv6` `ipv4_only` `ipv6_only`.
 
-Take no effect if `server.strategy` is set.
-
 #### disable_cache
 
 Disable dns cache.
@@ -61,6 +60,14 @@ Disable dns cache expire.
 #### independent_cache
 
 Make each DNS server's cache independent for special purposes. If enabled, will slightly degrade performance.
+
+#### cache_capacity
+
+!!! question "Since sing-box 1.11.0"
+
+LRU cache capacity.
+
+Value less than 1024 will be ignored.
 
 #### reverse_mapping
 
