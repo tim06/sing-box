@@ -70,7 +70,7 @@ nfpms:
       signature:
         key_file: "{{ .Env.NFPM_KEY_PATH }}"
       fields:
-        Bugs: https://github.com/SagerNet/sing-box/issues
+        Bugs: https://github.com/securedproxy/sing-box/issues
     rpm:
       signature:
         key_file: "{{ .Env.NFPM_KEY_PATH }}"
