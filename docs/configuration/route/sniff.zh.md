@@ -1,7 +1,3 @@
----
-icon: material/new-box
----
-
 !!! quote "sing-box 1.10.0 中的更改"
 
     :material-plus: QUIC 的 客户端类型探测支持  
@@ -26,6 +22,7 @@ icon: material/new-box
 |   UDP   |    `dtls`    |      /      |     /      |
 |   TCP   |    `ssh`     |      /      | SSH 客户端名称  |
 |   TCP   |    `rdp`     |      /      |     /      |
+|   UDP   |    `ntp`     |      /      |     /      |
 
 |         QUIC 客户端         |     类型     |
 |:------------------------:|:----------:|

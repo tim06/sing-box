@@ -5,10 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tim06/sing-box/common/srs"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/common/srs"
+	"github.com/sagernet/sing-box/log"
+	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common/json"
 
 	"github.com/spf13/cobra"
@@ -56,10 +55,6 @@ func compileRuleSet(sourcePath string) error {
 	if err != nil {
 		return err
 	}
-	ruleSet, err := plainRuleSet.Upgrade()
-	if err != nil {
-		return err
-	}
 	var outputPath string
 	if flagRuleSetCompileOutput == flagRuleSetCompileDefaultOutput {
 		if strings.HasSuffix(sourcePath, ".json") {
@@ -74,7 +69,7 @@ func compileRuleSet(sourcePath string) error {
 	if err != nil {
 		return err
 	}
-	err = srs.Write(outputFile, ruleSet, plainRuleSet.Version == C.RuleSetVersion2)
+	err = srs.Write(outputFile, plainRuleSet.Options, plainRuleSet.Version)
 	if err != nil {
 		outputFile.Close()
 		os.Remove(outputPath)

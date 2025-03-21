@@ -5,10 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tim06/sing-box/common/srs"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/common/srs"
+	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing/common/json"
 
 	"github.com/spf13/cobra"
@@ -48,13 +46,9 @@ func decompileRuleSet(sourcePath string) error {
 			return err
 		}
 	}
-	plainRuleSet, err := srs.Read(reader, true)
+	ruleSet, err := srs.Read(reader, true)
 	if err != nil {
 		return err
-	}
-	ruleSet := option.PlainRuleSetCompat{
-		Version: C.RuleSetVersion1,
-		Options: plainRuleSet,
 	}
 	var outputPath string
 	if flagRuleSetDecompileOutput == flagRuleSetDecompileDefaultOutput {

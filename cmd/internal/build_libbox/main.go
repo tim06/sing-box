@@ -8,19 +8,23 @@ import (
 	"strings"
 
 	_ "github.com/sagernet/gomobile"
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
+	"github.com/sagernet/sing-box/cmd/internal/build_shared"
+	"github.com/sagernet/sing-box/log"
+	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/rw"
+	"github.com/sagernet/sing/common/shell"
 )
 
 var (
 	debugEnabled bool
 	target       string
+	platform     string
 )
 
 func init() {
 	flag.BoolVar(&debugEnabled, "debug", false, "enable debug")
 	flag.StringVar(&target, "target", "android", "target platform")
+	flag.StringVar(&platform, "platform", "", "specify platform")
 }
 
 func main() {
@@ -31,8 +35,8 @@ func main() {
 	switch target {
 	case "android":
 		buildAndroid()
-	case "ios":
-		buildiOS()
+	case "apple":
+		buildApple()
 	}
 }
 
@@ -41,6 +45,7 @@ var (
 	debugFlags  []string
 	sharedTags  []string
 	iosTags     []string
+	memcTags    []string
 	debugTags   []string
 )
 
@@ -54,39 +59,67 @@ func init() {
 	sharedFlags = append(sharedFlags, "-ldflags", "-X github.com/sagernet/sing-box/constant.Version="+currentTag+" -s -w -buildid=")
 	debugFlags = append(debugFlags, "-ldflags", "-X github.com/sagernet/sing-box/constant.Version="+currentTag)
 
-	sharedTags = append(sharedTags, "with_gvisor", "with_quic", "with_wireguard", "with_ech", "with_utls", "with_clash_api", "with_grpc")
+	sharedTags = append(sharedTags, "with_gvisor", "with_quic", "with_wireguard", "with_utls", "with_clash_api")
 	iosTags = append(iosTags, "with_dhcp", "with_low_memory", "with_conntrack")
+	memcTags = append(memcTags, "with_tailscale")
 	debugTags = append(debugTags, "debug")
 }
 
 func buildAndroid() {
 	build_shared.FindSDK()
 
+	var javaPath string
+	javaHome := os.Getenv("JAVA_HOME")
+	if javaHome == "" {
+		javaPath = "java"
+	} else {
+		javaPath = filepath.Join(javaHome, "bin", "java")
+	}
+
+	javaVersion, err := shell.Exec(javaPath, "--version").ReadOutput()
+	if err != nil {
+		log.Fatal(E.Cause(err, "check java version"))
+	}
+	if !strings.Contains(javaVersion, "openjdk 17") {
+		log.Fatal("java version should be openjdk 17")
+	}
+
+	var bindTarget string
+	if platform != "" {
+		bindTarget = platform
+	} else if debugEnabled {
+		bindTarget = "android/arm64"
+	} else {
+		bindTarget = "android"
+	}
+
 	args := []string{
 		"bind",
 		"-v",
+		"-target", bindTarget,
 		"-androidapi", "21",
-		"-javapkg=com.tim",
+		"-javapkg=io.nekohasekai",
 		"-libname=box",
 	}
+
 	if !debugEnabled {
 		args = append(args, sharedFlags...)
 	} else {
 		args = append(args, debugFlags...)
 	}
 
-	args = append(args, "-tags")
-	if !debugEnabled {
-		args = append(args, strings.Join(sharedTags, ","))
-	} else {
-		args = append(args, strings.Join(append(sharedTags, debugTags...), ","))
+	tags := append(sharedTags, memcTags...)
+	if debugEnabled {
+		tags = append(tags, debugTags...)
 	}
+
+	args = append(args, "-tags", strings.Join(tags, ","))
 	args = append(args, "./experimental/libbox")
 
 	command := exec.Command(build_shared.GoBinPath+"/gomobile", args...)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
-	err := command.Run()
+	err = command.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,13 +136,24 @@ func buildAndroid() {
 	}
 }
 
-func buildiOS() {
+func buildApple() {
+	var bindTarget string
+	if platform != "" {
+		bindTarget = platform
+	} else if debugEnabled {
+		bindTarget = "ios"
+	} else {
+		bindTarget = "ios,tvos,macos"
+	}
+
 	args := []string{
 		"bind",
 		"-v",
-		"-target", "ios,iossimulator,tvos,tvossimulator,macos",
+		"-target", bindTarget,
 		"-libname=box",
+		"-tags-macos=" + strings.Join(memcTags, ","),
 	}
+
 	if !debugEnabled {
 		args = append(args, sharedFlags...)
 	} else {
@@ -117,12 +161,11 @@ func buildiOS() {
 	}
 
 	tags := append(sharedTags, iosTags...)
-	args = append(args, "-tags")
-	if !debugEnabled {
-		args = append(args, strings.Join(tags, ","))
-	} else {
-		args = append(args, strings.Join(append(tags, debugTags...), ","))
+	if debugEnabled {
+		tags = append(tags, debugTags...)
 	}
+
+	args = append(args, "-tags", strings.Join(tags, ","))
 	args = append(args, "./experimental/libbox")
 
 	command := exec.Command(build_shared.GoBinPath+"/gomobile", args...)

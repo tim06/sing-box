@@ -5,10 +5,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tim06/sing-box/cmd/sing-box/internal/convertor/adguard"
-	"github.com/tim06/sing-box/common/srs"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/cmd/sing-box/internal/convertor/adguard"
+	"github.com/sagernet/sing-box/common/srs"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/log"
+	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 
 	"github.com/spf13/cobra"
@@ -77,7 +78,7 @@ func convertRuleSet(sourcePath string) error {
 		return err
 	}
 	defer outputFile.Close()
-	err = srs.Write(outputFile, option.PlainRuleSet{Rules: rules}, true)
+	err = srs.Write(outputFile, option.PlainRuleSet{Rules: rules}, C.RuleSetVersion2)
 	if err != nil {
 		outputFile.Close()
 		os.Remove(outputPath)
