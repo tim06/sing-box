@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/sagernet/reality"
-	"github.com/sagernet/sing-box/common/dialer"
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/common/dialer"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing/common/debug"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"

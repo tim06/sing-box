@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/sagernet/sing-box/adapter"
+	"github.com/tim06/sing-box/adapter"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"

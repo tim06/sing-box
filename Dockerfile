@@ -1,7 +1,7 @@
 FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS builder
 LABEL maintainer="nekohasekai <contact-git@sekai.icu>"
-COPY . /go/src/github.com/sagernet/sing-box
-WORKDIR /go/src/github.com/sagernet/sing-box
+COPY . /go/src/github.com/tim06/sing-box
+WORKDIR /go/src/github.com/tim06/sing-box
 ARG TARGETOS TARGETARCH
 ARG GOPROXY=""
 ENV GOPROXY ${GOPROXY}

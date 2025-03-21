@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sagernet/sing-box"
-	"github.com/sagernet/sing-box/experimental/deprecated"
-	"github.com/sagernet/sing-box/include"
-	"github.com/sagernet/sing-box/log"
+	"github.com/tim06/sing-box"
+	"github.com/tim06/sing-box/experimental/deprecated"
+	"github.com/tim06/sing-box/include"
+	"github.com/tim06/sing-box/log"
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/filemanager"
 

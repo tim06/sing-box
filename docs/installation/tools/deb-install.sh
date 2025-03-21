@@ -17,7 +17,7 @@ VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest
     | cut -d ":" -f2 \
     | sed 's/\"//g;s/\,//g;s/\ //g;s/v//')
 
-curl -Lo sing-box.deb "https://github.com/SagerNet/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.deb"
+curl -Lo sing-box.deb "https://github.com/tim06/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.deb"
 sudo dpkg -i sing-box.deb
 rm sing-box.deb
 

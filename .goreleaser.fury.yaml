@@ -6,7 +6,7 @@ builds:
       - -v
       - -trimpath
     ldflags:
-      - -X github.com/sagernet/sing-box/constant.Version={{ .Version }}
+      - -X github.com/tim06/sing-box/constant.Version={{ .Version }}
       - -s
       - -buildid=
     tags:
@@ -70,7 +70,7 @@ nfpms:
       signature:
         key_file: "{{ .Env.NFPM_KEY_PATH }}"
       fields:
-        Bugs: https://github.com/SagerNet/sing-box/issues
+        Bugs: https://github.com/tim06/sing-box/issues
     rpm:
       signature:
         key_file: "{{ .Env.NFPM_KEY_PATH }}"

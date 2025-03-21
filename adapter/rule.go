@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	C "github.com/sagernet/sing-box/constant"
+	C "github.com/tim06/sing-box/constant"
 )
 
 type HeadlessRule interface {

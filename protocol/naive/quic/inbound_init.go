@@ -6,9 +6,9 @@ import (
 
 	"github.com/sagernet/quic-go"
 	"github.com/sagernet/quic-go/http3"
-	"github.com/sagernet/sing-box/common/listener"
-	"github.com/sagernet/sing-box/common/tls"
-	"github.com/sagernet/sing-box/protocol/naive"
+	"github.com/tim06/sing-box/common/listener"
+	"github.com/tim06/sing-box/common/tls"
+	"github.com/tim06/sing-box/protocol/naive"
 	"github.com/sagernet/sing-quic"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"

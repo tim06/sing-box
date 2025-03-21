@@ -1,9 +1,9 @@
 package platform
 
 import (
-	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/common/process"
-	"github.com/sagernet/sing-box/option"
+	"github.com/tim06/sing-box/adapter"
+	"github.com/tim06/sing-box/common/process"
+	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/logger"
 )

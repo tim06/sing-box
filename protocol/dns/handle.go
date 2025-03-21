@@ -5,9 +5,9 @@ import (
 	"encoding/binary"
 	"net"
 
-	"github.com/sagernet/sing-box/adapter"
-	C "github.com/sagernet/sing-box/constant"
-	"github.com/sagernet/sing-box/dns"
+	"github.com/tim06/sing-box/adapter"
+	C "github.com/tim06/sing-box/constant"
+	"github.com/tim06/sing-box/dns"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/bufio"

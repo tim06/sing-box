@@ -3,15 +3,15 @@
 package include
 
 import (
-	"github.com/sagernet/sing-box/adapter/inbound"
-	"github.com/sagernet/sing-box/adapter/outbound"
-	"github.com/sagernet/sing-box/dns"
-	"github.com/sagernet/sing-box/dns/transport/quic"
-	"github.com/sagernet/sing-box/protocol/hysteria"
-	"github.com/sagernet/sing-box/protocol/hysteria2"
-	_ "github.com/sagernet/sing-box/protocol/naive/quic"
-	"github.com/sagernet/sing-box/protocol/tuic"
-	_ "github.com/sagernet/sing-box/transport/v2rayquic"
+	"github.com/tim06/sing-box/adapter/inbound"
+	"github.com/tim06/sing-box/adapter/outbound"
+	"github.com/tim06/sing-box/dns"
+	"github.com/tim06/sing-box/dns/transport/quic"
+	"github.com/tim06/sing-box/protocol/hysteria"
+	"github.com/tim06/sing-box/protocol/hysteria2"
+	_ "github.com/tim06/sing-box/protocol/naive/quic"
+	"github.com/tim06/sing-box/protocol/tuic"
+	_ "github.com/tim06/sing-box/transport/v2rayquic"
 )
 
 func registerQUICInbounds(registry *inbound.Registry) {

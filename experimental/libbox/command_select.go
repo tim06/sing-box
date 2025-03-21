@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"net"
 
-	"github.com/sagernet/sing-box/protocol/group"
+	"github.com/tim06/sing-box/protocol/group"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/varbin"
 )

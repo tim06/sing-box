@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/netip"
 
-	C "github.com/sagernet/sing-box/constant"
-	"github.com/sagernet/sing-box/log"
-	"github.com/sagernet/sing-box/option"
+	C "github.com/tim06/sing-box/constant"
+	"github.com/tim06/sing-box/log"
+	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing/common/logger"
 
 	"github.com/miekg/dns"

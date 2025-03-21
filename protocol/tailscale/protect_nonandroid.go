@@ -2,7 +2,7 @@
 
 package tailscale
 
-import "github.com/sagernet/sing-box/experimental/libbox/platform"
+import "github.com/tim06/sing-box/experimental/libbox/platform"
 
 func setAndroidProtectFunc(platformInterface platform.Interface) {
 }

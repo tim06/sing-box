@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"sync"
 
-	C "github.com/sagernet/sing-box/constant"
+	C "github.com/tim06/sing-box/constant"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
 	"github.com/sagernet/sing/common/ntp"
