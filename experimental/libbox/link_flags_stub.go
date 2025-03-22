@@ -2,10 +2,10 @@
 
 package libbox
 
-import (
+/* import (
 	"net"
-)
+) */
 
-func linkFlags(rawFlags uint32) net.Flags {
+/* func linkFlags(rawFlags uint32) net.Flags {
 	panic("stub!")
-}
+} */

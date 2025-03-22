@@ -7,6 +7,11 @@ import (
 	"github.com/sagernet/sing/common/varbin"
 )
 
+const (
+    eventTypeEmpty   = 0
+    eventTypeOpenURL = 1
+)
+
 type myEvent interface {
 	writeTo(writer varbin.Writer)
 }
