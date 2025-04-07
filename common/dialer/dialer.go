@@ -23,6 +23,8 @@ type Options struct {
 	DirectResolver   bool
 	ResolverOnDetour bool
 	NewDialer        bool
+	LegacyDNSDialer  bool
+	DirectOutbound   bool
 }
 
 // TODO: merge with NewWithOptions
@@ -45,7 +47,7 @@ func NewWithOptions(options Options) (N.Dialer, error) {
 		if outboundManager == nil {
 			return nil, E.New("missing outbound manager")
 		}
-		dialer = NewDetour(outboundManager, dialOptions.Detour)
+		dialer = NewDetour(outboundManager, dialOptions.Detour, options.LegacyDNSDialer)
 	} else {
 		dialer, err = NewDefault(options.Context, dialOptions)
 		if err != nil {
@@ -101,13 +103,13 @@ func NewWithOptions(options Options) (N.Dialer, error) {
 			}
 			dnsQueryOptions.Transport = transport
 			resolveFallbackDelay = time.Duration(dialOptions.FallbackDelay)
-		} else if options.NewDialer {
-			return nil, E.New("missing domain resolver for domain server address")
 		} else {
 			transports := dnsTransport.Transports()
 			if len(transports) < 2 {
 				dnsQueryOptions.Transport = dnsTransport.Default()
-			} else {
+			} else if options.NewDialer {
+				return nil, E.New("missing domain resolver for domain server address")
+			} else if !options.DirectOutbound {
 				deprecated.Report(options.Context, deprecated.OptionMissingDomainResolver)
 			}
 		}
