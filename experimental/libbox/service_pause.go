@@ -3,7 +3,7 @@ package libbox
 import (
 	"time"
 
-	C "github.com/sagernet/sing-box/constant"
+	C "github.com/tim06/sing-box/constant"
 )
 
 type iOSPauseFields struct {

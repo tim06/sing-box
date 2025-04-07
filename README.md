@@ -1,4 +1,4 @@
-# sing-box
+# sing-box 1.12.0-beta.2
 
 The universal proxy platform.
 
