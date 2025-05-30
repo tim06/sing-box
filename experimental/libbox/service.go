@@ -2,6 +2,7 @@ package libbox
 
 import (
 	"context"
+	"fmt"
 	"net/netip"
 	"os"
 	"runtime"
@@ -10,7 +11,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/tim06/sing-box"
+	tun "github.com/sagernet/sing-tun"
+	"github.com/sagernet/sing/common"
+	"github.com/sagernet/sing/common/control"
+	E "github.com/sagernet/sing/common/exceptions"
+	"github.com/sagernet/sing/common/logger"
+	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/service"
+	"github.com/sagernet/sing/service/filemanager"
+	"github.com/sagernet/sing/service/pause"
+	box "github.com/tim06/sing-box"
 	"github.com/tim06/sing-box/adapter"
 	"github.com/tim06/sing-box/common/process"
 	"github.com/tim06/sing-box/common/urltest"
@@ -20,15 +30,7 @@ import (
 	"github.com/tim06/sing-box/experimental/libbox/platform"
 	"github.com/tim06/sing-box/log"
 	"github.com/tim06/sing-box/option"
-	"github.com/sagernet/sing-tun"
-	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/control"
-	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/logger"
-	N "github.com/sagernet/sing/common/network"
-	"github.com/sagernet/sing/service"
-	"github.com/sagernet/sing/service/filemanager"
-	"github.com/sagernet/sing/service/pause"
+	"github.com/tim06/sing-box/protocol/group"
 )
 
 type BoxService struct {
@@ -80,18 +82,41 @@ func NewService(configContent string, platformInterface PlatformInterface) (*Box
 }
 
 func (s *BoxService) Start() error {
+	var err error
 	if sFixAndroidStack {
-		var err error
 		done := make(chan struct{})
 		go func() {
 			err = s.instance.Start()
 			close(done)
 		}()
 		<-done
-		return err
 	} else {
-		return s.instance.Start()
+		err = s.instance.Start()
 	}
+
+	if err == nil {
+		go func() {
+			ticker := time.NewTicker(60 * time.Second)
+			defer ticker.Stop()
+
+			if selectErr := s.selectFirstAvailableOutbound(); selectErr != nil {
+				log.Warn("Failed to select first available outbound: ", selectErr)
+			}
+
+			for {
+				select {
+				case <-ticker.C:
+					if selectErr := s.selectFirstAvailableOutbound(); selectErr != nil {
+						log.Warn("Failed to select first available outbound: ", selectErr)
+					}
+				case <-s.ctx.Done():
+					return
+				}
+			}
+		}()
+	}
+
+	return err
 }
 
 func (s *BoxService) Close() error {
@@ -274,4 +299,42 @@ func (w *platformInterfaceWrapper) WriteMessage(level log.Level, message string)
 
 func (w *platformInterfaceWrapper) SendNotification(notification *platform.Notification) error {
 	return w.iif.SendNotification((*Notification)(notification))
+}
+
+func (s *BoxService) selectFirstAvailableOutbound() error {
+	var selectorOutbound *group.Selector
+
+	for _, outbound := range s.instance.Outbound().Outbounds() {
+		if selector, ok := outbound.(*group.Selector); ok {
+			selectorOutbound = selector
+			break
+		}
+	}
+
+	if selectorOutbound == nil {
+		return fmt.Errorf("no selector outbound found")
+	}
+
+	for _, outboundTag := range selectorOutbound.All() {
+		outbound, found := s.instance.Outbound().Outbound(outboundTag)
+		if !found {
+			continue
+		}
+
+		if outbound.Type() == C.TypeURLTest {
+			continue
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		delay, err := urltest.URLTest(ctx, "https://www.gstatic.com/generate_204", outbound)
+		cancel()
+
+		if err == nil && delay > 0 {
+			if selectorOutbound.SelectOutbound(outboundTag) {
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("no available outbound found")
 }
