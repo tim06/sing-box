@@ -3,14 +3,18 @@ package listener
 import (
 	"net"
 	"net/netip"
+	"syscall"
 	"time"
 
 	"github.com/tim06/sing-box/adapter"
+	"github.com/tim06/sing-box/common/redir"
 	C "github.com/tim06/sing-box/constant"
 	"github.com/tim06/sing-box/log"
+	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/service"
 
 	"github.com/metacubex/tfo-go"
 )
@@ -23,6 +27,15 @@ func (l *Listener) ListenTCP() (net.Listener, error) {
 	var err error
 	bindAddr := M.SocksaddrFrom(l.listenOptions.Listen.Build(netip.AddrFrom4([4]byte{127, 0, 0, 1})), l.listenOptions.ListenPort)
 	var listenConfig net.ListenConfig
+	if l.listenOptions.BindInterface != "" {
+		listenConfig.Control = control.Append(listenConfig.Control, control.BindToInterface(service.FromContext[adapter.NetworkManager](l.ctx).InterfaceFinder(), l.listenOptions.BindInterface, -1))
+	}
+	if l.listenOptions.RoutingMark != 0 {
+		listenConfig.Control = control.Append(listenConfig.Control, control.RoutingMark(uint32(l.listenOptions.RoutingMark)))
+	}
+	if l.listenOptions.ReuseAddr {
+		listenConfig.Control = control.Append(listenConfig.Control, control.ReuseAddr())
+	}
 	if l.listenOptions.TCPKeepAlive >= 0 {
 		keepIdle := time.Duration(l.listenOptions.TCPKeepAlive)
 		if keepIdle == 0 {
@@ -39,6 +52,13 @@ func (l *Listener) ListenTCP() (net.Listener, error) {
 			return nil, E.New("MultiPath TCP requires go1.21, please recompile your binary.")
 		}
 		setMultiPathTCP(&listenConfig)
+	}
+	if l.tproxy {
+		listenConfig.Control = control.Append(listenConfig.Control, func(network, address string, conn syscall.RawConn) error {
+			return control.Raw(conn, func(fd uintptr) error {
+				return redir.TProxy(fd, !M.ParseSocksaddr(address).IsIPv4(), false)
+			})
+		})
 	}
 	tcpListener, err := ListenNetworkNamespace[net.Listener](l.listenOptions.NetNs, func() (net.Listener, error) {
 		if l.listenOptions.TCPFastOpen {

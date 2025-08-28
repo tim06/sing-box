@@ -2,7 +2,6 @@ package route
 
 import (
 	"context"
-	"errors"
 	"net"
 	"time"
 
@@ -10,7 +9,7 @@ import (
 	C "github.com/tim06/sing-box/constant"
 	"github.com/tim06/sing-box/dns"
 	dnsOutbound "github.com/tim06/sing-box/protocol/dns"
-	"github.com/sagernet/sing-tun"
+	R "github.com/tim06/sing-box/route/rule"
 	"github.com/sagernet/sing/common/buf"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
@@ -27,12 +26,16 @@ func (r *Router) hijackDNSStream(ctx context.Context, conn net.Conn, metadata ad
 		conn.SetReadDeadline(time.Now().Add(C.DNSTimeout))
 		err := dnsOutbound.HandleStreamDNSRequest(ctx, r.dns, conn, metadata)
 		if err != nil {
-			return err
+			if !E.IsClosedOrCanceled(err) {
+				return err
+			} else {
+				return nil
+			}
 		}
 	}
 }
 
-func (r *Router) hijackDNSPacket(ctx context.Context, conn N.PacketConn, packetBuffers []*N.PacketBuffer, metadata adapter.InboundContext) {
+func (r *Router) hijackDNSPacket(ctx context.Context, conn N.PacketConn, packetBuffers []*N.PacketBuffer, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) error {
 	if natConn, isNatConn := conn.(udpnat.Conn); isNatConn {
 		metadata.Destination = M.Socksaddr{}
 		for _, packet := range packetBuffers {
@@ -47,19 +50,22 @@ func (r *Router) hijackDNSPacket(ctx context.Context, conn N.PacketConn, packetB
 			conn:     conn,
 			ctx:      ctx,
 			metadata: metadata,
+			onClose:  onClose,
 		})
-		return
+		return nil
 	}
 	err := dnsOutbound.NewDNSPacketConnection(ctx, r.dns, conn, packetBuffers, metadata)
+	N.CloseOnHandshakeFailure(conn, onClose, err)
 	if err != nil && !E.IsClosedOrCanceled(err) {
-		r.logger.ErrorContext(ctx, E.Cause(err, "process DNS packet connection"))
+		return E.Cause(err, "process DNS packet")
 	}
+	return nil
 }
 
 func ExchangeDNSPacket(ctx context.Context, router adapter.DNSRouter, logger logger.ContextLogger, conn N.PacketConn, buffer *buf.Buffer, metadata adapter.InboundContext, destination M.Socksaddr) {
 	err := exchangeDNSPacket(ctx, router, conn, buffer, metadata, destination)
-	if err != nil && !errors.Is(err, tun.ErrDrop) && !E.IsClosedOrCanceled(err) {
-		logger.ErrorContext(ctx, E.Cause(err, "process DNS packet connection"))
+	if err != nil && !R.IsRejected(err) && !E.IsClosedOrCanceled(err) {
+		logger.ErrorContext(ctx, E.Cause(err, "process DNS packet"))
 	}
 }
 
@@ -88,8 +94,16 @@ type dnsHijacker struct {
 	conn     N.PacketConn
 	ctx      context.Context
 	metadata adapter.InboundContext
+	onClose  N.CloseHandlerFunc
 }
 
 func (h *dnsHijacker) NewPacketEx(buffer *buf.Buffer, destination M.Socksaddr) {
 	go ExchangeDNSPacket(h.ctx, h.router, h.logger, h.conn, buffer, h.metadata, destination)
+}
+
+func (h *dnsHijacker) Close() error {
+	if h.onClose != nil {
+		h.onClose(nil)
+	}
+	return nil
 }

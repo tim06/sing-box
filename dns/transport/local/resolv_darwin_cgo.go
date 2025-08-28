@@ -11,6 +11,7 @@ package local
 import "C"
 
 import (
+	"context"
 	"time"
 
 	E "github.com/sagernet/sing/common/exceptions"
@@ -18,8 +19,9 @@ import (
 	"github.com/miekg/dns"
 )
 
-func dnsReadConfig(_ string) *dnsConfig {
-	if C.res_init() != 0 {
+func dnsReadConfig(_ context.Context, _ string) *dnsConfig {
+	var state C.struct___res_state
+	if C.res_ninit(&state) != 0 {
 		return &dnsConfig{
 			servers:  defaultNS,
 			search:   dnsDefaultSearch(),
@@ -32,10 +34,10 @@ func dnsReadConfig(_ string) *dnsConfig {
 	conf := &dnsConfig{
 		ndots:    1,
 		timeout:  5 * time.Second,
-		attempts: int(C._res.retry),
+		attempts: int(state.retry),
 	}
-	for i := 0; i < int(C._res.nscount); i++ {
-		ns := C._res.nsaddr_list[i]
+	for i := 0; i < int(state.nscount); i++ {
+		ns := state.nsaddr_list[i]
 		addr := C.inet_ntoa(ns.sin_addr)
 		if addr == nil {
 			continue
@@ -43,7 +45,7 @@ func dnsReadConfig(_ string) *dnsConfig {
 		conf.servers = append(conf.servers, C.GoString(addr))
 	}
 	for i := 0; ; i++ {
-		search := C._res.dnsrch[i]
+		search := state.dnsrch[i]
 		if search == nil {
 			break
 		}

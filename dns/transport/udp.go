@@ -13,6 +13,7 @@ import (
 	"github.com/tim06/sing-box/log"
 	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing/common/buf"
+	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
@@ -47,6 +48,9 @@ func NewUDP(ctx context.Context, logger log.ContextLogger, tag string, options o
 	if serverAddr.Port == 0 {
 		serverAddr.Port = 53
 	}
+	if !serverAddr.IsValid() {
+		return nil, E.New("invalid server address: ", serverAddr)
+	}
 	return NewUDPRaw(logger, dns.NewTransportAdapterWithRemoteOptions(C.DNSTypeUDP, tag, options), transportDialer, serverAddr), nil
 }
 
@@ -56,7 +60,7 @@ func NewUDPRaw(logger logger.ContextLogger, adapter dns.TransportAdapter, dialer
 		logger:           logger,
 		dialer:           dialer,
 		serverAddr:       serverAddr,
-		udpSize:          512,
+		udpSize:          2048,
 		tcpTransport: &TCPTransport{
 			dialer:     dialer,
 			serverAddr: serverAddr,
@@ -93,14 +97,18 @@ func (t *UDPTransport) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.M
 }
 
 func (t *UDPTransport) exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, error) {
-	conn, err := t.open(ctx)
-	if err != nil {
-		return nil, err
-	}
+	t.access.Lock()
 	if edns0Opt := message.IsEdns0(); edns0Opt != nil {
 		if udpSize := int(edns0Opt.UDPSize()); udpSize > t.udpSize {
 			t.udpSize = udpSize
+			close(t.done)
+			t.done = make(chan struct{})
 		}
+	}
+	t.access.Unlock()
+	conn, err := t.open(ctx)
+	if err != nil {
+		return nil, err
 	}
 	buffer := buf.NewSize(1 + message.Len())
 	defer buffer.Release()
@@ -117,7 +125,7 @@ func (t *UDPTransport) exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.M
 	conn.access.Unlock()
 	defer func() {
 		conn.access.Lock()
-		delete(conn.callbacks, messageId)
+		delete(conn.callbacks, exMessage.Id)
 		conn.access.Unlock()
 	}()
 	rawMessage, err := exMessage.PackBuffer(buffer.FreeBytes())

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tim06/sing-box/cmd/sing-box/internal/convertor/adguard"
+	"github.com/tim06/sing-box/common/convertor/adguard"
 	"github.com/tim06/sing-box/common/srs"
 	C "github.com/tim06/sing-box/constant"
 	"github.com/tim06/sing-box/log"
@@ -54,7 +54,7 @@ func convertRuleSet(sourcePath string) error {
 	var rules []option.HeadlessRule
 	switch flagRuleSetConvertType {
 	case "adguard":
-		rules, err = adguard.Convert(reader)
+		rules, err = adguard.ToOptions(reader, log.StdLogger())
 	case "":
 		return E.New("source type is required")
 	default:

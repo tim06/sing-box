@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tim06/sing-box"
 	"github.com/tim06/sing-box/experimental/deprecated"
 	"github.com/tim06/sing-box/include"
 	"github.com/tim06/sing-box/log"
@@ -68,6 +67,5 @@ func preRun(cmd *cobra.Command, args []string) {
 	if len(configPaths) == 0 && len(configDirectories) == 0 {
 		configPaths = append(configPaths, "config.json")
 	}
-	globalCtx = service.ContextWith(globalCtx, deprecated.NewStderrManager(log.StdLogger()))
-	globalCtx = box.Context(globalCtx, include.InboundRegistry(), include.OutboundRegistry(), include.EndpointRegistry(), include.DNSTransportRegistry())
+	globalCtx = include.Context(service.ContextWith(globalCtx, deprecated.NewStderrManager(log.StdLogger())))
 }

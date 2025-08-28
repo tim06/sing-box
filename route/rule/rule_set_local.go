@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/sagernet/fswatch"
 	"github.com/tim06/sing-box/adapter"
@@ -13,7 +14,6 @@ import (
 	C "github.com/tim06/sing-box/constant"
 	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/atomic"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
 	"github.com/sagernet/sing/common/json"

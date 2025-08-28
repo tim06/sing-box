@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
-    "strings"
 
 	"github.com/tim06/sing-box/adapter"
 	"github.com/tim06/sing-box/adapter/outbound"
@@ -15,7 +15,6 @@ import (
 	"github.com/tim06/sing-box/log"
 	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/atomic"
 	"github.com/sagernet/sing/common/batch"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
@@ -193,7 +192,7 @@ type URLTestGroup struct {
 	ticker                       *time.Ticker
 	close                        chan struct{}
 	started                      bool
-	lastActive                   atomic.TypedValue[time.Time]
+	lastActive                   common.TypedValue[time.Time]
 }
 
 func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManager, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, tolerance uint16, idleTimeout time.Duration, interruptExternalConnections bool) (*URLTestGroup, error) {
@@ -270,53 +269,6 @@ func (g *URLTestGroup) Close() error {
 }
 
 func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
-	var result adapter.Outbound
-	for _, detour := range g.outbounds {
-		tag := detour.Tag()
-		if strings.HasPrefix(tag, "auto") {
-			result, _ = g.SelectByPing(network)
-			if result != nil {
-				g.logger.Debug("Use selector by ping(Defalt) selected tag: ", result.Tag())
-			} else {
-				g.logger.Debug("Use selector by ping(Defalt) ALL unavailable")
-			}
-			break;
-		}
-	}
-	if result == nil {
-		result, _ = g.SelectByOrder(network)
-		if result != nil {
-			g.logger.Debug("Use selector by order selected tag: ", result.Tag())
-		} else {
-			g.logger.Debug("Use selector by order ALL unavailable")
-		}
-	}
-	return result, result != nil
-}
-
-func (g *URLTestGroup) SelectByOrder(network string) (adapter.Outbound, bool) {
-	var selectedOutbound adapter.Outbound
-	for _, detour := range g.outbounds {
-		if !common.Contains(detour.Network(), network) {
-			continue
-		}
-
-		history := g.history.LoadURLTestHistory(RealTag(detour))
-		if history == nil {
-			continue
-		}
-
-		selectedOutbound = detour
-		break
-	}
-	if selectedOutbound == nil {
-		return nil, false
-	}
-
-	return selectedOutbound, true
-}
-
-func (g *URLTestGroup) SelectByPing(network string) (adapter.Outbound, bool) {
 	var minDelay uint16
 	var minOutbound adapter.Outbound
 	switch network {
@@ -361,7 +313,7 @@ func (g *URLTestGroup) SelectByPing(network string) (adapter.Outbound, bool) {
 }
 
 func (g *URLTestGroup) loopCheck() {
-	if time.Now().Sub(g.lastActive.Load()) > g.interval {
+	if time.Since(g.lastActive.Load()) > g.interval {
 		g.lastActive.Store(time.Now())
 		g.CheckOutbounds(false)
 	}
@@ -371,7 +323,7 @@ func (g *URLTestGroup) loopCheck() {
 			return
 		case <-g.ticker.C:
 		}
-		if time.Now().Sub(g.lastActive.Load()) > g.idleTimeout {
+		if time.Since(g.lastActive.Load()) > g.idleTimeout {
 			g.access.Lock()
 			g.ticker.Stop()
 			g.ticker = nil
@@ -408,7 +360,7 @@ func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint
 			continue
 		}
 		history := g.history.LoadURLTestHistory(realTag)
-		if !force && history != nil && time.Now().Sub(history.Time) < g.interval {
+		if !force && history != nil && time.Since(history.Time) < g.interval {
 			continue
 		}
 		checked[realTag] = true
@@ -444,12 +396,16 @@ func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint
 func (g *URLTestGroup) performUpdateCheck() {
 	var updated bool
 	if outbound, exists := g.Select(N.NetworkTCP); outbound != nil && (g.selectedOutboundTCP == nil || (exists && outbound != g.selectedOutboundTCP)) {
+		if g.selectedOutboundTCP != nil {
+			updated = true
+		}
 		g.selectedOutboundTCP = outbound
-		updated = true
 	}
 	if outbound, exists := g.Select(N.NetworkUDP); outbound != nil && (g.selectedOutboundUDP == nil || (exists && outbound != g.selectedOutboundUDP)) {
+		if g.selectedOutboundUDP != nil {
+			updated = true
+		}
 		g.selectedOutboundUDP = outbound
-		updated = true
 	}
 	if updated {
 		g.interruptGroup.Interrupt(g.interruptExternalConnections)

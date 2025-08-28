@@ -19,7 +19,6 @@ import (
 	"github.com/tim06/sing-box/option"
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/atomic"
 	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
@@ -37,7 +36,7 @@ var _ adapter.NetworkManager = (*NetworkManager)(nil)
 type NetworkManager struct {
 	logger            logger.ContextLogger
 	interfaceFinder   *control.DefaultInterfaceFinder
-	networkInterfaces atomic.TypedValue[[]adapter.NetworkInterface]
+	networkInterfaces common.TypedValue[[]adapter.NetworkInterface]
 
 	autoDetectInterface    bool
 	defaultOptions         adapter.NetworkOptions
@@ -57,6 +56,15 @@ type NetworkManager struct {
 
 func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, routeOptions option.RouteOptions) (*NetworkManager, error) {
 	defaultDomainResolver := common.PtrValueOrDefault(routeOptions.DefaultDomainResolver)
+	if routeOptions.AutoDetectInterface && !(C.IsLinux || C.IsDarwin || C.IsWindows) {
+		return nil, E.New("`auto_detect_interface` is only supported on Linux, Windows and macOS")
+	} else if routeOptions.OverrideAndroidVPN && !C.IsAndroid {
+		return nil, E.New("`override_android_vpn` is only supported on Android")
+	} else if routeOptions.DefaultInterface != "" && !(C.IsLinux || C.IsDarwin || C.IsWindows) {
+		return nil, E.New("`default_interface` is only supported on Linux, Windows and macOS")
+	} else if routeOptions.DefaultMark != 0 && !C.IsLinux {
+		return nil, E.New("`default_mark` is only supported on linux")
+	}
 	nm := &NetworkManager{
 		logger:              logger,
 		interfaceFinder:     control.NewDefaultInterfaceFinder(),
@@ -345,6 +353,15 @@ func (r *NetworkManager) RegisterAutoRedirectOutputMark(mark uint32) error {
 
 func (r *NetworkManager) AutoRedirectOutputMark() uint32 {
 	return r.autoRedirectOutputMark
+}
+
+func (r *NetworkManager) AutoRedirectOutputMarkFunc() control.Func {
+	return func(network, address string, conn syscall.RawConn) error {
+		if r.autoRedirectOutputMark == 0 {
+			return nil
+		}
+		return control.RoutingMark(r.autoRedirectOutputMark)(network, address, conn)
+	}
 }
 
 func (r *NetworkManager) NetworkMonitor() tun.NetworkUpdateMonitor {
