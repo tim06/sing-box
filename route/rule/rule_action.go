@@ -2,6 +2,7 @@ package rule
 
 import (
 	"context"
+	"errors"
 	"net/netip"
 	"strings"
 	"sync"
@@ -40,6 +41,7 @@ func NewRuleAction(ctx context.Context, logger logger.ContextLogger, action opti
 				UDPConnect:                action.RouteOptions.UDPConnect,
 				TLSFragment:               action.RouteOptions.TLSFragment,
 				TLSFragmentFallbackDelay:  time.Duration(action.RouteOptions.TLSFragmentFallbackDelay),
+				TLSRecordFragment:         action.RouteOptions.TLSRecordFragment,
 			},
 		}, nil
 	case C.RuleActionTypeRouteOptions:
@@ -53,6 +55,7 @@ func NewRuleAction(ctx context.Context, logger logger.ContextLogger, action opti
 			UDPTimeout:                time.Duration(action.RouteOptionsOptions.UDPTimeout),
 			TLSFragment:               action.RouteOptionsOptions.TLSFragment,
 			TLSFragmentFallbackDelay:  time.Duration(action.RouteOptionsOptions.TLSFragmentFallbackDelay),
+			TLSRecordFragment:         action.RouteOptionsOptions.TLSRecordFragment,
 		}, nil
 	case C.RuleActionTypeDirect:
 		directDialer, err := dialer.New(ctx, option.DialerOptions(action.DirectOptions), false)
@@ -152,15 +155,7 @@ func (r *RuleActionRoute) Type() string {
 func (r *RuleActionRoute) String() string {
 	var descriptions []string
 	descriptions = append(descriptions, r.Outbound)
-	if r.UDPDisableDomainUnmapping {
-		descriptions = append(descriptions, "udp-disable-domain-unmapping")
-	}
-	if r.UDPConnect {
-		descriptions = append(descriptions, "udp-connect")
-	}
-	if r.TLSFragment {
-		descriptions = append(descriptions, "tls-fragment")
-	}
+	descriptions = append(descriptions, r.Descriptions()...)
 	return F.ToString("route(", strings.Join(descriptions, ","), ")")
 }
 
@@ -176,6 +171,7 @@ type RuleActionRouteOptions struct {
 	UDPTimeout                time.Duration
 	TLSFragment               bool
 	TLSFragmentFallbackDelay  time.Duration
+	TLSRecordFragment         bool
 }
 
 func (r *RuleActionRouteOptions) Type() string {
@@ -183,6 +179,10 @@ func (r *RuleActionRouteOptions) Type() string {
 }
 
 func (r *RuleActionRouteOptions) String() string {
+	return F.ToString("route-options(", strings.Join(r.Descriptions(), ","), ")")
+}
+
+func (r *RuleActionRouteOptions) Descriptions() []string {
 	var descriptions []string
 	if r.OverrideAddress.IsValid() {
 		descriptions = append(descriptions, F.ToString("override-address=", r.OverrideAddress.AddrString()))
@@ -211,7 +211,16 @@ func (r *RuleActionRouteOptions) String() string {
 	if r.UDPTimeout > 0 {
 		descriptions = append(descriptions, "udp-timeout")
 	}
-	return F.ToString("route-options(", strings.Join(descriptions, ","), ")")
+	if r.TLSFragment {
+		descriptions = append(descriptions, "tls-fragment")
+	}
+	if r.TLSFragmentFallbackDelay > 0 {
+		descriptions = append(descriptions, F.ToString("tls-fragment-fallback-delay=", r.TLSFragmentFallbackDelay.String()))
+	}
+	if r.TLSRecordFragment {
+		descriptions = append(descriptions, "tls-record-fragment")
+	}
+	return descriptions
 }
 
 type RuleActionDNSRoute struct {
@@ -276,6 +285,23 @@ func (r *RuleActionDirect) String() string {
 	return "direct" + r.description
 }
 
+type RejectedError struct {
+	Cause error
+}
+
+func (r *RejectedError) Error() string {
+	return "rejected"
+}
+
+func (r *RejectedError) Unwrap() error {
+	return r.Cause
+}
+
+func IsRejected(err error) bool {
+	var rejected *RejectedError
+	return errors.As(err, &rejected)
+}
+
 type RuleActionReject struct {
 	Method      string
 	NoDrop      bool
@@ -299,9 +325,9 @@ func (r *RuleActionReject) Error(ctx context.Context) error {
 	var returnErr error
 	switch r.Method {
 	case C.RuleActionRejectMethodDefault:
-		returnErr = syscall.ECONNREFUSED
+		returnErr = &RejectedError{syscall.ECONNREFUSED}
 	case C.RuleActionRejectMethodDrop:
-		return tun.ErrDrop
+		return &RejectedError{tun.ErrDrop}
 	default:
 		panic(F.ToString("unknown reject method: ", r.Method))
 	}
@@ -319,7 +345,7 @@ func (r *RuleActionReject) Error(ctx context.Context) error {
 		if ctx != nil {
 			r.logger.DebugContext(ctx, "dropped due to flooding")
 		}
-		return tun.ErrDrop
+		return &RejectedError{tun.ErrDrop}
 	}
 	return returnErr
 }

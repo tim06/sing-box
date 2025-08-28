@@ -55,6 +55,7 @@ func NewRouter(ctx context.Context, logFactory log.Factory, options option.DNSOp
 		DisableExpire:    options.DNSClientOptions.DisableExpire,
 		IndependentCache: options.DNSClientOptions.IndependentCache,
 		CacheCapacity:    options.DNSClientOptions.CacheCapacity,
+		ClientSubnet:     options.DNSClientOptions.ClientSubnet.Build(netip.Prefix{}),
 		RDRC: func() adapter.RDRCStore {
 			cacheFile := service.FromContext[adapter.CacheFile](ctx)
 			if cacheFile == nil {
@@ -258,7 +259,14 @@ func (r *Router) Exchange(ctx context.Context, message *mDNS.Msg, options adapte
 					case *R.RuleActionReject:
 						switch action.Method {
 						case C.RuleActionRejectMethodDefault:
-							return FixedResponse(message.Id, message.Question[0], nil, 0), nil
+							return &mDNS.Msg{
+								MsgHdr: mDNS.MsgHdr{
+									Id:       message.Id,
+									Rcode:    mDNS.RcodeRefused,
+									Response: true,
+								},
+								Question: []mDNS.Question{message.Question[0]},
+							}, nil
 						case C.RuleActionRejectMethodDrop:
 							return nil, tun.ErrDrop
 						}
@@ -323,6 +331,9 @@ func (r *Router) Lookup(ctx context.Context, domain string, options adapter.DNSQ
 		err           error
 	)
 	printResult := func() {
+		if err == nil && len(responseAddrs) == 0 {
+			err = E.New("empty result")
+		}
 		if err != nil {
 			if errors.Is(err, ErrResponseRejectedCached) {
 				r.logger.DebugContext(ctx, "response rejected for ", domain, " (cached)")
@@ -331,15 +342,15 @@ func (r *Router) Lookup(ctx context.Context, domain string, options adapter.DNSQ
 			} else {
 				r.logger.ErrorContext(ctx, E.Cause(err, "lookup failed for ", domain))
 			}
-		} else if len(responseAddrs) == 0 {
-			r.logger.ErrorContext(ctx, "lookup failed for ", domain, ": empty result")
-			err = RcodeNameError
+		}
+		if err != nil {
+			err = E.Cause(err, "lookup ", domain)
 		}
 	}
 	responseAddrs, cached = r.client.LookupCache(domain, options.Strategy)
 	if cached {
 		if len(responseAddrs) == 0 {
-			return nil, RcodeNameError
+			return nil, E.New("lookup ", domain, ": empty result (cached)")
 		}
 		return responseAddrs, nil
 	}

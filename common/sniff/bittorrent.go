@@ -9,7 +9,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	C "github.com/sagernet/sing-box/constant"
-	E "github.com/sagernet/sing/common/exceptions"
+	E "github.com/securedproxy/sing/common/exceptions"
 )
 
 const (
@@ -31,13 +31,18 @@ func BitTorrent(_ context.Context, metadata *adapter.InboundContext, reader io.R
 		return os.ErrInvalid
 	}
 
+	const header = "BitTorrent protocol"
 	var protocol [19]byte
-	_, err = reader.Read(protocol[:])
+	var n int
+	n, err = reader.Read(protocol[:])
+	if string(protocol[:n]) != header[:n] {
+		return os.ErrInvalid
+	}
 	if err != nil {
 		return E.Cause1(ErrNeedMoreData, err)
 	}
-	if string(protocol[:]) != "BitTorrent protocol" {
-		return os.ErrInvalid
+	if n < 19 {
+		return ErrNeedMoreData
 	}
 
 	metadata.Protocol = C.ProtocolBitTorrent

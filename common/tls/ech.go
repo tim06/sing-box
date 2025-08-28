@@ -10,6 +10,8 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/dns"
@@ -23,7 +25,7 @@ import (
 	"golang.org/x/crypto/cryptobyte"
 )
 
-func parseECHClientConfig(ctx context.Context, options option.OutboundTLSOptions, tlsConfig *tls.Config) (Config, error) {
+func parseECHClientConfig(ctx context.Context, clientConfig ECHCapableConfig, options option.OutboundTLSOptions) (Config, error) {
 	var echConfig []byte
 	if len(options.ECH.Config) > 0 {
 		echConfig = []byte(strings.Join(options.ECH.Config, "\n"))
@@ -43,10 +45,13 @@ func parseECHClientConfig(ctx context.Context, options option.OutboundTLSOptions
 		if block == nil || block.Type != "ECH CONFIGS" || len(rest) > 0 {
 			return nil, E.New("invalid ECH configs pem")
 		}
-		tlsConfig.EncryptedClientHelloConfigList = block.Bytes
-		return &STDClientConfig{tlsConfig}, nil
+		clientConfig.SetECHConfigList(block.Bytes)
+		return clientConfig, nil
 	} else {
-		return &STDECHClientConfig{STDClientConfig{tlsConfig}, service.FromContext[adapter.DNSRouter](ctx)}, nil
+		return &ECHClientConfig{
+			ECHCapableConfig: clientConfig,
+			dnsRouter:        service.FromContext[adapter.DNSRouter](ctx),
+		}, nil
 	}
 }
 
@@ -97,20 +102,37 @@ func reloadECHKeys(echKeyPath string, tlsConfig *tls.Config) error {
 	return nil
 }
 
-type STDECHClientConfig struct {
-	STDClientConfig
-	dnsRouter adapter.DNSRouter
+type ECHClientConfig struct {
+	ECHCapableConfig
+	access     sync.Mutex
+	dnsRouter  adapter.DNSRouter
+	lastTTL    time.Duration
+	lastUpdate time.Time
 }
 
-func (s *STDECHClientConfig) ClientHandshake(ctx context.Context, conn net.Conn) (aTLS.Conn, error) {
-	if len(s.config.EncryptedClientHelloConfigList) == 0 {
+func (s *ECHClientConfig) ClientHandshake(ctx context.Context, conn net.Conn) (aTLS.Conn, error) {
+	tlsConn, err := s.fetchAndHandshake(ctx, conn)
+	if err != nil {
+		return nil, err
+	}
+	err = tlsConn.HandshakeContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return tlsConn, nil
+}
+
+func (s *ECHClientConfig) fetchAndHandshake(ctx context.Context, conn net.Conn) (aTLS.Conn, error) {
+	s.access.Lock()
+	defer s.access.Unlock()
+	if len(s.ECHConfigList()) == 0 || s.lastTTL == 0 || time.Since(s.lastUpdate) > s.lastTTL {
 		message := &mDNS.Msg{
 			MsgHdr: mDNS.MsgHdr{
 				RecursionDesired: true,
 			},
 			Question: []mDNS.Question{
 				{
-					Name:   mDNS.Fqdn(s.config.ServerName),
+					Name:   mDNS.Fqdn(s.ServerName()),
 					Qtype:  mDNS.TypeHTTPS,
 					Qclass: mDNS.ClassINET,
 				},
@@ -133,29 +155,23 @@ func (s *STDECHClientConfig) ClientHandshake(ctx context.Context, conn net.Conn)
 						if err != nil {
 							return nil, E.Cause(err, "decode ECH config")
 						}
-						s.config.EncryptedClientHelloConfigList = echConfigList
+						s.lastTTL = time.Duration(rr.Header().Ttl) * time.Second
+						s.lastUpdate = time.Now()
+						s.SetECHConfigList(echConfigList)
 						break match
 					}
 				}
 			}
 		}
-		if len(s.config.EncryptedClientHelloConfigList) == 0 {
+		if len(s.ECHConfigList()) == 0 {
 			return nil, E.New("no ECH config found in DNS records")
 		}
 	}
-	tlsConn, err := s.Client(conn)
-	if err != nil {
-		return nil, err
-	}
-	err = tlsConn.HandshakeContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return tlsConn, nil
+	return s.Client(conn)
 }
 
-func (s *STDECHClientConfig) Clone() Config {
-	return &STDECHClientConfig{STDClientConfig{s.config.Clone()}, s.dnsRouter}
+func (s *ECHClientConfig) Clone() Config {
+	return &ECHClientConfig{ECHCapableConfig: s.ECHCapableConfig.Clone().(ECHCapableConfig), dnsRouter: s.dnsRouter, lastUpdate: s.lastUpdate}
 }
 
 func UnmarshalECHKeys(raw []byte) ([]tls.EncryptedClientHelloKey, error) {

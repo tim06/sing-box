@@ -3,10 +3,12 @@ package v2raywebsocket
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"io"
 	"net"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	C "github.com/sagernet/sing-box/constant"
@@ -67,9 +69,10 @@ func (c *WebsocketConn) Read(b []byte) (n int, err error) {
 			return
 		}
 		if !E.IsMulti(err, io.EOF, wsutil.ErrNoFrameAdvance) {
+			err = wrapWsError(err)
 			return
 		}
-		header, err = c.reader.NextFrame()
+		header, err = wrapWsError0(c.reader.NextFrame())
 		if err != nil {
 			return
 		}
@@ -78,14 +81,14 @@ func (c *WebsocketConn) Read(b []byte) (n int, err error) {
 				err = wsutil.ErrFrameTooLarge
 				return
 			}
-			err = c.controlHandler(header, c.reader)
+			err = wrapWsError(c.controlHandler(header, c.reader))
 			if err != nil {
 				return
 			}
 			continue
 		}
 		if header.OpCode&ws.OpBinary == 0 {
-			err = c.reader.Discard()
+			err = wrapWsError(c.reader.Discard())
 			if err != nil {
 				return
 			}
@@ -95,7 +98,7 @@ func (c *WebsocketConn) Read(b []byte) (n int, err error) {
 }
 
 func (c *WebsocketConn) Write(p []byte) (n int, err error) {
-	err = wsutil.WriteMessage(c.Conn, c.state, ws.OpBinary, p)
+	err = wrapWsError(wsutil.WriteMessage(c.Conn, c.state, ws.OpBinary, p))
 	if err != nil {
 		return
 	}
@@ -133,20 +136,22 @@ func (c *WebsocketConn) Upstream() any {
 type EarlyWebsocketConn struct {
 	*Client
 	ctx    context.Context
-	conn   *WebsocketConn
+	conn   atomic.Pointer[WebsocketConn]
 	access sync.Mutex
 	create chan struct{}
 	err    error
 }
 
 func (c *EarlyWebsocketConn) Read(b []byte) (n int, err error) {
-	if c.conn == nil {
+	conn := c.conn.Load()
+	if conn == nil {
 		<-c.create
 		if c.err != nil {
 			return 0, c.err
 		}
+		conn = c.conn.Load()
 	}
-	return c.conn.Read(b)
+	return wrapWsError0(conn.Read(b))
 }
 
 func (c *EarlyWebsocketConn) writeRequest(content []byte) error {
@@ -185,21 +190,23 @@ func (c *EarlyWebsocketConn) writeRequest(content []byte) error {
 			return err
 		}
 	}
-	c.conn = conn
+	c.conn.Store(conn)
 	return nil
 }
 
 func (c *EarlyWebsocketConn) Write(b []byte) (n int, err error) {
-	if c.conn != nil {
-		return c.conn.Write(b)
+	conn := c.conn.Load()
+	if conn != nil {
+		return wrapWsError0(conn.Write(b))
 	}
 	c.access.Lock()
 	defer c.access.Unlock()
+	conn = c.conn.Load()
 	if c.err != nil {
 		return 0, c.err
 	}
-	if c.conn != nil {
-		return c.conn.Write(b)
+	if conn != nil {
+		return wrapWsError0(conn.Write(b))
 	}
 	err = c.writeRequest(b)
 	c.err = err
@@ -211,16 +218,18 @@ func (c *EarlyWebsocketConn) Write(b []byte) (n int, err error) {
 }
 
 func (c *EarlyWebsocketConn) WriteBuffer(buffer *buf.Buffer) error {
-	if c.conn != nil {
-		return c.conn.WriteBuffer(buffer)
+	conn := c.conn.Load()
+	if conn != nil {
+		return wrapWsError(conn.WriteBuffer(buffer))
 	}
 	c.access.Lock()
 	defer c.access.Unlock()
-	if c.conn != nil {
-		return c.conn.WriteBuffer(buffer)
-	}
 	if c.err != nil {
 		return c.err
+	}
+	conn = c.conn.Load()
+	if conn != nil {
+		return wrapWsError(conn.WriteBuffer(buffer))
 	}
 	err := c.writeRequest(buffer.Bytes())
 	c.err = err
@@ -229,24 +238,27 @@ func (c *EarlyWebsocketConn) WriteBuffer(buffer *buf.Buffer) error {
 }
 
 func (c *EarlyWebsocketConn) Close() error {
-	if c.conn == nil {
+	conn := c.conn.Load()
+	if conn == nil {
 		return nil
 	}
-	return c.conn.Close()
+	return conn.Close()
 }
 
 func (c *EarlyWebsocketConn) LocalAddr() net.Addr {
-	if c.conn == nil {
+	conn := c.conn.Load()
+	if conn == nil {
 		return M.Socksaddr{}
 	}
-	return c.conn.LocalAddr()
+	return conn.LocalAddr()
 }
 
 func (c *EarlyWebsocketConn) RemoteAddr() net.Addr {
-	if c.conn == nil {
+	conn := c.conn.Load()
+	if conn == nil {
 		return M.Socksaddr{}
 	}
-	return c.conn.RemoteAddr()
+	return conn.RemoteAddr()
 }
 
 func (c *EarlyWebsocketConn) SetDeadline(t time.Time) error {
@@ -266,9 +278,29 @@ func (c *EarlyWebsocketConn) NeedAdditionalReadDeadline() bool {
 }
 
 func (c *EarlyWebsocketConn) Upstream() any {
-	return common.PtrOrNil(c.conn)
+	return common.PtrOrNil(c.conn.Load())
 }
 
 func (c *EarlyWebsocketConn) LazyHeadroom() bool {
-	return c.conn == nil
+	return c.conn.Load() == nil
+}
+
+func wrapWsError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var closedErr wsutil.ClosedError
+	if errors.As(err, &closedErr) {
+		if closedErr.Code == ws.StatusNormalClosure {
+			err = io.EOF
+		}
+	}
+	return err
+}
+
+func wrapWsError0[T any](value T, err error) (T, error) {
+	if err == nil {
+		return value, nil
+	}
+	return value, wrapWsError(err)
 }

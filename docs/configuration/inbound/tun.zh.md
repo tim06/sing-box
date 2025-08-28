@@ -1,6 +1,10 @@
 ---
-icon: material/alert-decagram
+icon: material/new-box
 ---
+
+!!! quote "sing-box 1.12.0 中的更改"
+
+    :material-plus: [loopback_address](#loopback_address)
 
 !!! quote "sing-box 1.11.0 中的更改"
 
@@ -56,9 +60,12 @@ icon: material/alert-decagram
   "auto_route": true,
   "iproute2_table_index": 2022,
   "iproute2_rule_index": 9000,
-  "auto_redirect": false,
+  "auto_redirect": true,
   "auto_redirect_input_mark": "0x2023",
   "auto_redirect_output_mark": "0x2024",
+  "loopback_address": [
+    "10.7.0.1"
+  ],
   "strict_route": true,
   "route_address": [
     "0.0.0.0/1",
@@ -217,7 +224,7 @@ tun 接口的 IPv6 前缀。
 
 !!! note "也启用 `auto_redirect`"
 
-  在 Linux 上始终推荐使用 `auto_redirect`，它提供更好的路由， 更高的性能（优于 tproxy）， 并避免与 Docker 桥接网络冲突。
+  在 Linux 上始终推荐使用 `auto_redirect`，它提供更好的路由， 更高的性能（优于 tproxy）， 并避免 TUN 与 Docker 桥接网络冲突。
 
 #### iproute2_table_index
 
@@ -241,19 +248,16 @@ tun 接口的 IPv6 前缀。
 
 !!! quote ""
 
-    仅支持 Linux，且需要 `auto_route` 已启用。 
+    仅支持 Linux，且需要 `auto_route` 已启用。
 
-自动配置 iptables/nftables 以重定向连接。
+通过使用 nftables 改善 TUN 路由和性能。
 
-在 Linux 上始终推荐使用 auto redirect，它提供更好的路由， 更高的性能（优于 tproxy）， 并避免与 Docker 桥接网络冲突。
+在 Linux 上始终推荐使用 `auto_redirect`，它提供更好的路由、更高的性能（优于 tproxy），并避免了 TUN 和 Docker 桥接网络之间的冲突。
 
-*在 Android 中*：
+请注意，`auto_redirect` 也适用于 Android，但由于缺少 `nftables` 和 `ip6tables`，仅执行简单的 IPv4 TCP 转发。  
+若要在 Android 上通过热点或中继器共享 VPN 连接，请使用 [VPNHotspot](https://github.com/Mygod/VPNHotspot)。
 
-仅转发本地 IPv4 连接。 要通过热点或中继共享您的 VPN 连接，请使用 [VPNHotspot](https://github.com/Mygod/VPNHotspot)。
-
-*在 Linux 中*:
-
-带有 `auto_redirect` 的 `auto_route` 在路由器上**无需干预**即可按预期工作。
+`auto_redirect` 还会自动将兼容性规则插入 OpenWrt 的 fw4 表中，即无需额外配置即可在路由器上工作。
 
 与 `route.default_mark` 和 `[dialOptions].routing_mark` 冲突。
 
@@ -261,7 +265,7 @@ tun 接口的 IPv6 前缀。
 
 !!! question "自 sing-box 1.10.0 起"
 
-`auto_redriect` 使用的连接输入标记。
+`auto_redirect` 使用的连接输入标记。
 
 默认使用 `0x2023`。
 
@@ -269,29 +273,35 @@ tun 接口的 IPv6 前缀。
 
 !!! question "自 sing-box 1.10.0 起"
 
-`auto_redriect` 使用的连接输出标记。
+`auto_redirect` 使用的连接输出标记。
 
 默认使用 `0x2024`。
 
+#### loopback_address
+
+!!! question "自 sing-box 1.12.0 起"
+
+环回地址是用于使指向指定地址的 TCP 连接连接到来源地址的。
+
+将选项值设置为 `10.7.0.1` 可实现与 SideStore/StosVPN 相同的行为。
+
+当启用 `auto_redirect` 时，可以作为网关为局域网设备（而不仅仅是本地）实现相同的行为。
+
 #### strict_route
 
-启用 `auto_route` 时执行严格的路由规则。
+当启用 `auto_route` 时，强制执行严格的路由规则：
 
-*在 Linux 中*:
+*在 Linux 中*：
 
-* 让不支持的网络无法到达
-* 使 ICMP 流量路由到 tun 而不是上游接口
-* 将所有连接路由到 tun
+* 使不支持的网络不可达。
+* 出于历史遗留原因，当未启用 `strict_route` 或 `auto_redirect` 时，所有 ICMP 流量将不会通过 TUN。
 
-它可以防止 IP 地址泄漏，并使 DNS 劫持在 Android 上工作。
+*在 Windows 中*：
 
-*在 Windows 中*:
+* 使不支持的网络不可达。
+* 阻止 Windows 的 [普通多宿主 DNS 解析行为](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/dd197552%28v%3Dws.10%29) 造成的 DNS 泄露
 
-* 添加防火墙规则以阻止 Windows
-  的 [普通多宿主 DNS 解析行为](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/dd197552%28v%3Dws.10%29)
-  造成的 DNS 泄露
-
-它可能会使某些应用程序（如 VirtualBox）在某些情况下无法正常工作。
+它可能会使某些 Windows 应用程序（如 VirtualBox）在某些情况下无法正常工作。
 
 #### route_address
 
@@ -405,11 +415,11 @@ UDP NAT 过期时间。
 
 TCP/IP 栈。
 
-| 栈      | 描述                                                               |
-|--------|------------------------------------------------------------------|
-| system | 基于系统网络栈执行 L3 到 L4 转换                                             |
-| gVisor | 基于 [gVisor](https://github.com/google/gvisor) 虚拟网络栈执行 L3 到 L4 转换 |
-| mixed  | 混合 `system` TCP 栈与 `gvisor` UDP 栈                                |
+| 栈       | 描述                                                                                                  | 
+|----------|-------------------------------------------------------------------------------------------------------|
+| `system` | 基于系统网络栈执行 L3 到 L4 转换                                                                        |
+| `gvisor` | 基于 [gVisor](https://github.com/google/gvisor) 虚拟网络栈执行 L3 到 L4 转换                            |
+| `mixed`  | 混合 `system` TCP 栈与 `gvisor` UDP 栈                                                                 |
 
 默认使用 `mixed` 栈如果 gVisor 构建标记已启用，否则默认使用 `system` 栈。
 

@@ -100,7 +100,6 @@ func rewriteRcodeAction(rcodeMap map[string]int, ruleAction *DNSRuleAction) {
 	}
 	ruleAction.Action = C.RuleActionTypePredefined
 	ruleAction.PredefinedOptions.Rcode = common.Ptr(DNSRCode(rcode))
-	return
 }
 
 type DNSClientOptions struct {
@@ -121,7 +120,6 @@ type LegacyDNSFakeIPOptions struct {
 type DNSTransportOptionsRegistry interface {
 	CreateOptions(transportType string) (any, bool)
 }
-
 type _DNSServerOptions struct {
 	Type    string `json:"type,omitempty"`
 	Tag     string `json:"tag,omitempty"`
@@ -181,7 +179,7 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 	options := o.Options.(*LegacyDNSServerOptions)
 	serverURL, _ := url.Parse(options.Address)
 	var serverType string
-	if serverURL.Scheme != "" {
+	if serverURL != nil && serverURL.Scheme != "" {
 		serverType = serverURL.Scheme
 	} else {
 		switch options.Address {
@@ -218,7 +216,7 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 		o.Type = C.DNSTypeUDP
 		o.Options = &remoteOptions
 		var serverAddr M.Socksaddr
-		if serverURL.Scheme == "" {
+		if serverURL == nil || serverURL.Scheme == "" {
 			serverAddr = M.ParseSocksaddr(options.Address)
 		} else {
 			serverAddr = M.ParseSocksaddr(serverURL.Host)
@@ -233,6 +231,9 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 	case C.DNSTypeTCP:
 		o.Type = C.DNSTypeTCP
 		o.Options = &remoteOptions
+		if serverURL == nil {
+			return E.New("invalid server address")
+		}
 		serverAddr := M.ParseSocksaddr(serverURL.Host)
 		if !serverAddr.IsValid() {
 			return E.New("invalid server address")
@@ -243,6 +244,9 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 		}
 	case C.DNSTypeTLS, C.DNSTypeQUIC:
 		o.Type = serverType
+		if serverURL == nil {
+			return E.New("invalid server address")
+		}
 		serverAddr := M.ParseSocksaddr(serverURL.Host)
 		if !serverAddr.IsValid() {
 			return E.New("invalid server address")
@@ -262,6 +266,9 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 			},
 		}
 		o.Options = &httpsOptions
+		if serverURL == nil {
+			return E.New("invalid server address")
+		}
 		serverAddr := M.ParseSocksaddr(serverURL.Host)
 		if !serverAddr.IsValid() {
 			return E.New("invalid server address")
@@ -275,6 +282,9 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 		}
 	case "rcode":
 		var rcode int
+		if serverURL == nil {
+			return E.New("invalid server address")
+		}
 		switch serverURL.Host {
 		case "success":
 			rcode = dns.RcodeSuccess
@@ -296,6 +306,9 @@ func (o *DNSServerOptions) Upgrade(ctx context.Context) error {
 	case C.DNSTypeDHCP:
 		o.Type = C.DNSTypeDHCP
 		dhcpOptions := DHCPDNSServerOptions{}
+		if serverURL == nil {
+			return E.New("invalid server address")
+		}
 		if serverURL.Host != "" && serverURL.Host != "auto" {
 			dhcpOptions.Interface = serverURL.Host
 		}

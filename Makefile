@@ -1,14 +1,13 @@
 NAME = sing-box
 COMMIT = $(shell git rev-parse --short HEAD)
-TAGS ?= with_gvisor,with_dhcp,with_wireguard,with_reality_server,with_clash_api,with_quic,with_utls,with_tailscale
-TAGS_TEST ?= with_gvisor,with_quic,with_wireguard,with_grpc,with_utls,with_reality_server
+TAGS ?= with_gvisor,with_quic,with_dhcp,with_wireguard,with_utls,with_acme,with_clash_api,with_tailscale
 
 GOHOSTOS = $(shell go env GOHOSTOS)
 GOHOSTARCH = $(shell go env GOHOSTARCH)
-VERSION=$(shell CGO_ENABLED=0 GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) go run ./cmd/internal/read_tag)
+VERSION=$(shell CGO_ENABLED=0 GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) go run github.com/sagernet/sing-box/cmd/internal/read_tag@latest)
 
 PARAMS = -v -trimpath -ldflags "-X 'github.com/sagernet/sing-box/constant.Version=$(VERSION)' -s -w -buildid="
-MAIN_PARAMS = $(PARAMS) -tags $(TAGS)
+MAIN_PARAMS = $(PARAMS) -tags "$(TAGS)"
 MAIN = ./cmd/sing-box
 PREFIX ?= $(shell go env GOPATH)
 
@@ -24,7 +23,7 @@ ci_build:
 	go build $(MAIN_PARAMS) $(MAIN)
 
 generate_completions:
-	go run -v --tags $(TAGS),generate,generate_completions $(MAIN)
+	go run -v --tags "$(TAGS),generate,generate_completions" $(MAIN)
 
 install:
 	go build -o $(PREFIX)/bin/$(NAME) $(MAIN_PARAMS) $(MAIN)
@@ -46,7 +45,7 @@ lint:
 	GOOS=freebsd golangci-lint run ./...
 
 lint_install:
-	go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install -v github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 proto:
 	@go run ./cmd/internal/protogen
@@ -108,6 +107,16 @@ build_ios:
 upload_ios_app_store:
 	cd ../sing-box-for-apple && \
 	xcodebuild -exportArchive -archivePath build/SFI.xcarchive -exportOptionsPlist SFI/Upload.plist -allowProvisioningUpdates
+
+export_ios_ipa:
+	cd ../sing-box-for-apple && \
+	xcodebuild -exportArchive -archivePath build/SFI.xcarchive -exportOptionsPlist SFI/Export.plist -allowProvisioningUpdates -exportPath build/SFI && \
+	cp build/SFI/sing-box.ipa dist/SFI.ipa
+
+upload_ios_ipa:
+	cd dist && \
+	cp SFI.ipa "SFI-${VERSION}.ipa" && \
+	ghr --replace --draft --prerelease "v${VERSION}" "SFI-${VERSION}.ipa"
 
 release_ios: build_ios upload_ios_app_store
 
@@ -176,6 +185,16 @@ upload_tvos_app_store:
 	cd ../sing-box-for-apple && \
 	xcodebuild -exportArchive -archivePath "build/SFT.xcarchive" -exportOptionsPlist SFI/Upload.plist -allowProvisioningUpdates
 
+export_tvos_ipa:
+	cd ../sing-box-for-apple && \
+	xcodebuild -exportArchive -archivePath "build/SFT.xcarchive" -exportOptionsPlist SFI/Export.plist -allowProvisioningUpdates -exportPath build/SFT && \
+	cp build/SFT/sing-box.ipa dist/SFT.ipa
+
+upload_tvos_ipa:
+	cd dist && \
+	cp SFT.ipa "SFT-${VERSION}.ipa" && \
+	ghr --replace --draft --prerelease "v${VERSION}" "SFT-${VERSION}.ipa"
+
 release_tvos: build_tvos upload_tvos_app_store
 
 update_apple_version:
@@ -226,8 +245,8 @@ lib:
 	go run ./cmd/internal/build_libbox -target ios
 
 lib_install:
-	go install -v github.com/sagernet/gomobile/cmd/gomobile@v0.1.6
-	go install -v github.com/sagernet/gomobile/cmd/gobind@v0.1.6
+	go install -v github.com/sagernet/gomobile/cmd/gomobile@v0.1.8
+	go install -v github.com/sagernet/gomobile/cmd/gobind@v0.1.8
 
 docs:
 	venv/bin/mkdocs serve
