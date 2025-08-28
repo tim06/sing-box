@@ -9,7 +9,7 @@ import (
 
 	"github.com/tim06/sing-box/adapter"
 	C "github.com/tim06/sing-box/constant"
-	E "github.com/tim06/sing/common/exceptions"
+	E "github.com/sagernet/sing/common/exceptions"
 )
 
 const (
