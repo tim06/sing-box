@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	_ "github.com/sagernet/gomobile"
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/rw"
 	"github.com/sagernet/sing/common/shell"
+	"github.com/tim06/sing-box/cmd/internal/build_shared"
+	"github.com/tim06/sing-box/log"
 )
 
 var (
@@ -39,6 +39,8 @@ func main() {
 		buildAndroid()
 	case "apple":
 		buildApple()
+	default:
+		log.Fatal("unknown target: ", target)
 	}
 }
 
@@ -52,6 +54,8 @@ var (
 	debugTags   []string
 )
 
+const extLd = `-extldflags "-Wl,-z,separate-loadable-segments -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=4096"`
+
 func init() {
 	sharedFlags = append(sharedFlags, "-trimpath")
 	sharedFlags = append(sharedFlags, "-buildvcs=false")
@@ -59,8 +63,18 @@ func init() {
 	if err != nil {
 		currentTag = "unknown"
 	}
-	sharedFlags = append(sharedFlags, "-ldflags", "-X github.com/tim06/sing-box/constant.Version="+currentTag+" -s -w -buildid=")
-	debugFlags = append(debugFlags, "-ldflags", "-X github.com/tim06/sing-box/constant.Version="+currentTag)
+	sharedLd := []string{
+		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		"-s -w -buildid=",
+		extLd,
+	}
+	sharedFlags = append(sharedFlags, "-ldflags", strings.Join(sharedLd, " "))
+
+	debugLd := []string{
+		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		extLd,
+	}
+	debugFlags = append(debugFlags, "-ldflags", strings.Join(debugLd, " "))
 
 	sharedTags = append(sharedTags, "with_gvisor", "with_quic", "with_wireguard", "with_utls", "with_clash_api", "with_conntrack")
 	darwinTags = append(darwinTags, "with_dhcp")
@@ -107,26 +121,28 @@ func buildAndroid() {
 	}
 
 	if !debugEnabled {
-		sharedFlags[3] = sharedFlags[3] + " -checklinkname=0"
-		args = append(args, sharedFlags...)
+		args = append(args, addCheckLinkName(sharedFlags)...)
 	} else {
-		debugFlags[1] = debugFlags[1] + " -checklinkname=0"
-		args = append(args, debugFlags...)
+		args = append(args, addCheckLinkName(debugFlags)...)
 	}
 
-	tags := append(sharedTags, memcTags...)
+	tags := append([]string{}, sharedTags...)
+	tags = append(tags, memcTags...)
 	if debugEnabled {
 		tags = append(tags, debugTags...)
 	}
-
 	args = append(args, "-tags", strings.Join(tags, ","))
 	args = append(args, "./experimental/libbox")
 
-	command := exec.Command(build_shared.GoBinPath+"/gomobile", args...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err = command.Run()
-	if err != nil {
+	cmd := exec.Command(build_shared.GoBinPath+"/gomobile", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	env := os.Environ()
+	if os.Getenv("CGO_ENABLED") == "" {
+		env = append(env, "CGO_ENABLED=1")
+	}
+	cmd.Env = env
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -134,8 +150,7 @@ func buildAndroid() {
 	copyPath := filepath.Join("..", "sing-box-for-android", "app", "libs")
 	if rw.IsDir(copyPath) {
 		copyPath, _ = filepath.Abs(copyPath)
-		err = rw.CopyFile(name, filepath.Join(copyPath, name))
-		if err != nil {
+		if err := rw.CopyFile(name, filepath.Join(copyPath, name)); err != nil {
 			log.Fatal(err)
 		}
 		log.Info("copied to ", copyPath)
@@ -157,7 +172,7 @@ func buildApple() {
 		"-v",
 		"-target", bindTarget,
 		"-libname=box",
-		"-tags-not-macos=with_low_memory",
+		"-tags-not-macos=" + strings.Join(notMemcTags, ","),
 	}
 	if !withTailscale {
 		args = append(args, "-tags-macos="+strings.Join(memcTags, ","))
@@ -169,7 +184,8 @@ func buildApple() {
 		args = append(args, debugFlags...)
 	}
 
-	tags := append(sharedTags, darwinTags...)
+	tags := append([]string{}, sharedTags...)
+	tags = append(tags, darwinTags...)
 	if withTailscale {
 		tags = append(tags, memcTags...)
 	}
@@ -180,11 +196,11 @@ func buildApple() {
 	args = append(args, "-tags", strings.Join(tags, ","))
 	args = append(args, "./experimental/libbox")
 
-	command := exec.Command(build_shared.GoBinPath+"/gomobile", args...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err := command.Run()
-	if err != nil {
+	cmd := exec.Command(build_shared.GoBinPath+"/gomobile", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -192,8 +208,20 @@ func buildApple() {
 	if rw.IsDir(copyPath) {
 		targetDir := filepath.Join(copyPath, "Libbox.xcframework")
 		targetDir, _ = filepath.Abs(targetDir)
-		os.RemoveAll(targetDir)
-		os.Rename("Libbox.xcframework", targetDir)
+		_ = os.RemoveAll(targetDir)
+		_ = os.Rename("Libbox.xcframework", targetDir)
 		log.Info("copied to ", targetDir)
 	}
+}
+
+func addCheckLinkName(flags []string) []string {
+	out := make([]string, len(flags))
+	copy(out, flags)
+	for i := 0; i < len(out)-1; i++ {
+		if out[i] == "-ldflags" {
+			out[i+1] = out[i+1] + " -checklinkname=0"
+			break
+		}
+	}
+	return out
 }
