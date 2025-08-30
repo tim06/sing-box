@@ -54,7 +54,7 @@ var (
 	debugTags   []string
 )
 
-const extLd = `-extldflags "-Wl,-z,separate-loadable-segments -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=4096"`
+const extLd = `-extldflags "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"`
 
 func init() {
 	sharedFlags = append(sharedFlags, "-trimpath")
