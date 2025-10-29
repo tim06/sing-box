@@ -67,10 +67,6 @@ jobs:
         run: |
           go run ./cmd/internal/build_libbox -target android
 
-      - name: Rename artifact with tag
-        run: |
-          mv libbox.aar "libbox.aar"
-
       - name: Upload Android Artifact (CI artifact)
         uses: actions/upload-artifact@v4
         with:
