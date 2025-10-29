@@ -129,6 +129,7 @@ jobs:
           name: ${{ github.event.inputs.release_name != '' && github.event.inputs.release_name || github.event.inputs.release_tag }}
           draft: ${{ github.event.inputs.draft }}
           prerelease: ${{ github.event.inputs.prerelease }}
+          omitBody: true
           allowUpdates: true
           artifactErrorsFailBuild: true
           artifacts: Libbox-${{ github.event.inputs.release_tag }}.xcframework.zip
