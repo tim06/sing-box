@@ -69,13 +69,13 @@ jobs:
 
       - name: Rename artifact with tag
         run: |
-          mv libbox.aar "libbox-android-${{ github.event.inputs.release_tag }}.aar"
+          mv libbox.aar "libbox.aar"
 
       - name: Upload Android Artifact (CI artifact)
         uses: actions/upload-artifact@v4
         with:
           name: libbox-aar
-          path: libbox-android-${{ github.event.inputs.release_tag }}.aar
+          path: libbox.aar
 
       - name: Publish GitHub Release (Android)
         uses: ncipollo/release-action@v1
@@ -86,7 +86,7 @@ jobs:
           prerelease: ${{ github.event.inputs.prerelease }}
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifacts: libbox-android-${{ github.event.inputs.release_tag }}.aar
+          artifacts: libbox.aar
           token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ios:
