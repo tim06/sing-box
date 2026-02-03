@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: 'Android or iOS'
+        description: 'Android, iOS, or both'
         required: true
         type: choice
         options:
           - android
           - ios
+          - both
       release_tag:
         description: 'Git tag for release (example: v1.2.3)'
         required: true
@@ -24,7 +25,7 @@ on:
         type: boolean
         default: false
       prerelease:
-        description: 'Is Rrerelease?'
+        description: 'Is prerelease?'
         required: false
         type: boolean
         default: false
@@ -32,9 +33,14 @@ on:
 permissions:
   contents: write
 
+# (опционально) чтобы не было параллельных запусков на один и тот же tag
+concurrency:
+  group: build-library-${{ github.event.inputs.release_tag }}
+  cancel-in-progress: false
+
 jobs:
   build_android:
-    if: ${{ github.event.inputs.platform == 'android' }}
+    if: ${{ github.event.inputs.platform == 'android' || github.event.inputs.platform == 'both' }}
     runs-on: ubuntu-latest
     env:
       CGO_ENABLED: 1
@@ -73,20 +79,8 @@ jobs:
           name: libbox-aar
           path: libbox.aar
 
-      - name: Publish GitHub Release (Android)
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ github.event.inputs.release_tag }}
-          name: ${{ github.event.inputs.release_name != '' && github.event.inputs.release_name || github.event.inputs.release_tag }}
-          draft: ${{ github.event.inputs.draft }}
-          prerelease: ${{ github.event.inputs.prerelease }}
-          allowUpdates: true
-          artifactErrorsFailBuild: true
-          artifacts: libbox.aar
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   build_ios:
-    if: ${{ github.event.inputs.platform == 'ios' }}
+    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     runs-on: macos-latest
     env:
       CGO_ENABLED: 1
@@ -118,7 +112,34 @@ jobs:
           name: libbox-xcframework
           path: Libbox-${{ github.event.inputs.release_tag }}.xcframework.zip
 
-      - name: Publish GitHub Release (iOS)
+  publish_release:
+    needs: [build_android, build_ios]
+    runs-on: ubuntu-latest
+    if: >
+      ${{
+        always() &&
+        (
+          (github.event.inputs.platform == 'android' && needs.build_android.result == 'success') ||
+          (github.event.inputs.platform == 'ios' && needs.build_ios.result == 'success') ||
+          (github.event.inputs.platform == 'both' && needs.build_android.result == 'success' && needs.build_ios.result == 'success')
+        )
+      }}
+    steps:
+      - name: Download Android artifact
+        if: ${{ needs.build_android.result == 'success' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: libbox-aar
+          path: dist
+
+      - name: Download iOS artifact
+        if: ${{ needs.build_ios.result == 'success' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: libbox-xcframework
+          path: dist
+
+      - name: Publish GitHub Release (Android/iOS/both)
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.inputs.release_tag }}
@@ -128,5 +149,5 @@ jobs:
           omitBody: true
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifacts: Libbox-${{ github.event.inputs.release_tag }}.xcframework.zip
+          artifacts: dist/*
           token: ${{ secrets.GITHUB_TOKEN }}
