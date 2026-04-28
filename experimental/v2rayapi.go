@@ -3,9 +3,9 @@ package experimental
 import (
 	"os"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 type V2RayServerConstructor = func(logger log.Logger, options option.V2RayAPIOptions) (adapter.V2RayServer, error)

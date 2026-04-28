@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/experimental/clashapi"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/clashapi"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/varbin"
 )

@@ -6,8 +6,8 @@ import (
 	"errors"
 	"io"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/protocol/http"

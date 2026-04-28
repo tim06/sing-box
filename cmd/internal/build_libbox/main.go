@@ -11,8 +11,8 @@ import (
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/rw"
 	"github.com/sagernet/sing/common/shell"
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/cmd/internal/build_shared"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 )
 
 var (
@@ -64,14 +64,14 @@ func init() {
 		currentTag = "unknown"
 	}
 	sharedLd := []string{
-		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		"-X github.com/FreeVPNProxySecure/sing-box/constant.Version=" + currentTag,
 		"-s -w -buildid=",
 		extLd,
 	}
 	sharedFlags = append(sharedFlags, "-ldflags", strings.Join(sharedLd, " "))
 
 	debugLd := []string{
-		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		"-X github.com/FreeVPNProxySecure/sing-box/constant.Version=" + currentTag,
 		extLd,
 	}
 	debugFlags = append(debugFlags, "-ldflags", strings.Join(debugLd, " "))
@@ -116,7 +116,7 @@ func buildAndroid() {
 		"-v",
 		"-target", bindTarget,
 		"-androidapi", "21",
-		"-javapkg=com.tim",
+		"-javapkg=com.freevpnproxysecure",
 		"-libname=box",
 	}
 

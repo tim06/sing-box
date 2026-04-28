@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/baderror"
 	"github.com/sagernet/sing/common/buf"

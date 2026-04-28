@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 )

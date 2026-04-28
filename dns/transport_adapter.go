@@ -3,9 +3,9 @@ package dns
 import (
 	"net/netip"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 var _ adapter.LegacyDNSTransport = (*TransportAdapter)(nil)

@@ -6,9 +6,9 @@ import (
 	"net/netip"
 	"testing"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/experimental/v2rayapi"
-	"github.com/tim06/sing-box/option"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/v2rayapi"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/json/badoption"
 

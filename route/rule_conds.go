@@ -1,8 +1,8 @@
 package route
 
 import (
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 func hasRule(rules []option.Rule, cond func(rule option.DefaultRule) bool) bool {

@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/json"
 	"github.com/sagernet/sing/common/json/badjson"

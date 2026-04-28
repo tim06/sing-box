@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/tim06/sing-box"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 
 	"github.com/spf13/cobra"
 )

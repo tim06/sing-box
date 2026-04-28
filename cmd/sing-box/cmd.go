@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tim06/sing-box/experimental/deprecated"
-	"github.com/tim06/sing-box/include"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/deprecated"
+	"github.com/FreeVPNProxySecure/sing-box/include"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/filemanager"
 

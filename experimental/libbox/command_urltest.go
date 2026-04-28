@@ -5,9 +5,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/urltest"
-	"github.com/tim06/sing-box/protocol/group"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/common/urltest"
+	"github.com/FreeVPNProxySecure/sing-box/protocol/group"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/batch"
 	E "github.com/sagernet/sing/common/exceptions"

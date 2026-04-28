@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/tim06/sing-box/common/geosite"
+	"github.com/FreeVPNProxySecure/sing-box/common/geosite"
 
 	"github.com/stretchr/testify/require"
 )

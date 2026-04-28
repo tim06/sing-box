@@ -3,8 +3,8 @@ package box
 import (
 	"runtime/debug"
 
-	"github.com/tim06/sing-box/common/conntrack"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/common/conntrack"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 func applyDebugOptions(options option.DebugOptions) {

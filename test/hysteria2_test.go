@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	"github.com/sagernet/sing-quic/hysteria2"
 	"github.com/sagernet/sing/common"
 	F "github.com/sagernet/sing/common/format"

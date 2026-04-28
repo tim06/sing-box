@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/settings"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/common/settings"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"

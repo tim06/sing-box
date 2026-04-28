@@ -6,9 +6,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/sniff"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/common/sniff"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 
 	"github.com/stretchr/testify/require"
 )

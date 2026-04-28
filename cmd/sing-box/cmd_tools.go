@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/tim06/sing-box"
+	"github.com/FreeVPNProxySecure/sing-box"
 	E "github.com/sagernet/sing/common/exceptions"
 	N "github.com/sagernet/sing/common/network"
 

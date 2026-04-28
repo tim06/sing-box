@@ -3,11 +3,11 @@
 package include
 
 import (
-	"github.com/tim06/sing-box/adapter/endpoint"
-	"github.com/tim06/sing-box/adapter/service"
-	"github.com/tim06/sing-box/dns"
-	"github.com/tim06/sing-box/protocol/tailscale"
-	"github.com/tim06/sing-box/service/derp"
+	"github.com/FreeVPNProxySecure/sing-box/adapter/endpoint"
+	"github.com/FreeVPNProxySecure/sing-box/adapter/service"
+	"github.com/FreeVPNProxySecure/sing-box/dns"
+	"github.com/FreeVPNProxySecure/sing-box/protocol/tailscale"
+	"github.com/FreeVPNProxySecure/sing-box/service/derp"
 )
 
 func registerTailscaleEndpoint(registry *endpoint.Registry) {

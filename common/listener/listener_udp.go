@@ -7,8 +7,8 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/redir"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/common/redir"
 	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"

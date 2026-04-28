@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/tim06/sing-box/common/tls"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/common/tls"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 
 	"github.com/spf13/cobra"
 )

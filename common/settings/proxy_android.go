@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	C "github.com/tim06/sing-box/constant"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
 	M "github.com/sagernet/sing/common/metadata"

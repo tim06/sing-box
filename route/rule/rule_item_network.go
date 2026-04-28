@@ -3,7 +3,7 @@ package rule
 import (
 	"strings"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
 	F "github.com/sagernet/sing/common/format"
 )
 

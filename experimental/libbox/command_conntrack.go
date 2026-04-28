@@ -6,7 +6,7 @@ import (
 	runtimeDebug "runtime/debug"
 	"time"
 
-	"github.com/tim06/sing-box/common/conntrack"
+	"github.com/FreeVPNProxySecure/sing-box/common/conntrack"
 )
 
 func (c *CommandClient) CloseConnections() error {

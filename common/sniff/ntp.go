@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"os"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 )
 
 func NTP(ctx context.Context, metadata *adapter.InboundContext, packet []byte) error {

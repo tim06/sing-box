@@ -17,6 +17,6 @@ VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest
     | cut -d ":" -f2 \
     | sed 's/\"//g;s/\,//g;s/\ //g;s/v//')
 
-curl -Lo sing-box.pkg.tar.zst "https://github.com/tim06/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.pkg.tar.zst"
+curl -Lo sing-box.pkg.tar.zst "https://github.com/FreeVPNProxySecure/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.pkg.tar.zst"
 sudo pacman -U sing-box.pkg.tar.zst
 rm sing-box.pkg.tar.zst

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
 	"github.com/sagernet/sing/common/bufio"
 	N "github.com/sagernet/sing/common/network"
 )

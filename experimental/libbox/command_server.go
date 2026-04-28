@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/tim06/sing-box/common/urltest"
-	"github.com/tim06/sing-box/experimental/clashapi"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/common/urltest"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/clashapi"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/debug"
 	E "github.com/sagernet/sing/common/exceptions"

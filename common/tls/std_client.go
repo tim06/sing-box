@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/tlsfragment"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/common/tlsfragment"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/ntp"
 )

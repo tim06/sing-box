@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/cmd/internal/build_shared"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 )
 
 func main() {

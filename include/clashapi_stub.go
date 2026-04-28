@@ -5,10 +5,10 @@ package include
 import (
 	"context"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/experimental"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/experimental"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 )
 

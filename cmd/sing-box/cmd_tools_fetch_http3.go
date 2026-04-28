@@ -9,7 +9,7 @@ import (
 
 	"github.com/sagernet/quic-go"
 	"github.com/sagernet/quic-go/http3"
-	box "github.com/tim06/sing-box"
+	box "github.com/FreeVPNProxySecure/sing-box"
 	"github.com/sagernet/sing/common/bufio"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"

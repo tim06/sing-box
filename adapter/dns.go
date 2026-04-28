@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/netip"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	"github.com/sagernet/sing/service"

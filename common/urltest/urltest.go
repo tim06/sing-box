@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	"github.com/sagernet/sing/common"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"

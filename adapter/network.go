@@ -3,7 +3,7 @@ package adapter
 import (
 	"time"
 
-	C "github.com/tim06/sing-box/constant"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
 )

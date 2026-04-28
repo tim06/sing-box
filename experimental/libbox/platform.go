@@ -1,8 +1,8 @@
 package libbox
 
 import (
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 type PlatformInterface interface {

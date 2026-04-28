@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/tim06/sing-box/common/geosite"
+	"github.com/FreeVPNProxySecure/sing-box/common/geosite"
 )
 
 type searchGeositeMatcher struct {

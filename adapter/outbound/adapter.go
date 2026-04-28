@@ -1,7 +1,7 @@
 package outbound
 
 import (
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 )
 
 type Adapter struct {

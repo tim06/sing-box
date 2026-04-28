@@ -3,7 +3,7 @@ package option
 import (
 	"context"
 
-	"github.com/tim06/sing-box/experimental/deprecated"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/deprecated"
 	"github.com/sagernet/sing/common/json"
 )
 

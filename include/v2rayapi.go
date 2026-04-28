@@ -2,4 +2,4 @@
 
 package include
 
-import _ "github.com/tim06/sing-box/experimental/v2rayapi"
+import _ "github.com/FreeVPNProxySecure/sing-box/experimental/v2rayapi"

@@ -104,13 +104,17 @@ jobs:
 
       - name: Zip XCFramework with tag
         run: |
-          zip -r "Libbox-${{ github.event.inputs.release_tag }}.xcframework.zip" Libbox.xcframework
+          SUFFIX=""
+          if [ "${{ github.event.inputs.platform }}" = "both" ]; then
+            SUFFIX="-both"
+          fi
+          zip -r "Libbox-${{ github.event.inputs.release_tag }}${SUFFIX}.xcframework.zip" Libbox.xcframework
 
       - name: Upload iOS Artifact (CI artifact)
         uses: actions/upload-artifact@v4
         with:
           name: libbox-xcframework
-          path: Libbox-${{ github.event.inputs.release_tag }}.xcframework.zip
+          path: Libbox-${{ github.event.inputs.release_tag }}${{ github.event.inputs.platform == 'both' && '-both' || '' }}.xcframework.zip
 
   publish_release:
     needs: [build_android, build_ios]

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/sagernet/asc-go/asc"
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/cmd/internal/build_shared"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"

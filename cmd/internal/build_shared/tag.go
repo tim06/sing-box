@@ -1,7 +1,7 @@
 package build_shared
 
 import (
-	"github.com/tim06/sing-box/common/badversion"
+	"github.com/FreeVPNProxySecure/sing-box/common/badversion"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/shell"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"

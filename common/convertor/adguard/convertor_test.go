@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/route/rule"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	"github.com/FreeVPNProxySecure/sing-box/route/rule"
 	"github.com/sagernet/sing/common/logger"
 
 	"github.com/stretchr/testify/require"

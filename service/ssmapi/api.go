@@ -3,7 +3,7 @@ package ssmapi
 import (
 	"net/http"
 
-	C "github.com/tim06/sing-box/constant"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	"github.com/sagernet/sing/common/logger"
 	sHTTP "github.com/sagernet/sing/protocol/http"
 

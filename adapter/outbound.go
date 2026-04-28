@@ -3,8 +3,8 @@ package adapter
 import (
 	"context"
 
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	N "github.com/sagernet/sing/common/network"
 )
 

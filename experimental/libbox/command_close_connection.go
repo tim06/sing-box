@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"net"
 
-	"github.com/tim06/sing-box/experimental/clashapi"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/clashapi"
 	"github.com/sagernet/sing/common/binary"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/varbin"

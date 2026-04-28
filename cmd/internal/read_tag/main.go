@@ -4,9 +4,9 @@ import (
 	"flag"
 	"os"
 
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/common/badversion"
-	"github.com/tim06/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/cmd/internal/build_shared"
+	"github.com/FreeVPNProxySecure/sing-box/common/badversion"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 )
 
 var (

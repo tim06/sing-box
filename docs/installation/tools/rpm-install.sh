@@ -17,6 +17,6 @@ VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest
     | cut -d ":" -f2 \
     | sed 's/\"//g;s/\,//g;s/\ //g;s/v//')
 
-curl -Lo sing-box.rpm "https://github.com/tim06/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.rpm"
+curl -Lo sing-box.rpm "https://github.com/FreeVPNProxySecure/sing-box/releases/download/v${VERSION}/sing-box_${VERSION}_linux_${ARCH}.rpm"
 sudo rpm -i sing-box.rpm
 rm sing-box.rpm

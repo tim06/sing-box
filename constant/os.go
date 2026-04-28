@@ -1,7 +1,7 @@
 package constant
 
 import (
-	"github.com/tim06/sing-box/constant/goos"
+	"github.com/FreeVPNProxySecure/sing-box/constant/goos"
 )
 
 const IsAndroid = goos.IsAndroid == 1

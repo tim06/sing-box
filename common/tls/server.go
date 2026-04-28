@@ -5,10 +5,10 @@ import (
 	"net"
 	"os"
 
-	"github.com/tim06/sing-box/common/badtls"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/FreeVPNProxySecure/sing-box/common/badtls"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/log"
+	"github.com/FreeVPNProxySecure/sing-box/option"
 	aTLS "github.com/sagernet/sing/common/tls"
 )
 

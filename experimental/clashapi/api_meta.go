@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/tim06/sing-box/experimental/clashapi/trafficontrol"
+	"github.com/FreeVPNProxySecure/sing-box/experimental/clashapi/trafficontrol"
 	"github.com/sagernet/sing/common/json"
 	"github.com/sagernet/ws"
 	"github.com/sagernet/ws/wsutil"

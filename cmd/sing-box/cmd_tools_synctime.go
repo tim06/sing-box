@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/log"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/log"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/common/ntp"

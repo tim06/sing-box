@@ -3,8 +3,8 @@ package rule
 import (
 	"strings"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/FreeVPNProxySecure/sing-box/adapter"
+	C "github.com/FreeVPNProxySecure/sing-box/constant"
 	"github.com/sagernet/sing/common"
 	F "github.com/sagernet/sing/common/format"
 )
