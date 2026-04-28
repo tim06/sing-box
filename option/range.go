@@ -43,6 +43,7 @@ func Parse2IntRange(str string) (IntRange, error) {
 
 	return result, err
 }
+
 func ParseIntRange(str string) ([]int, error) {
 	if str == "" {
 		return nil, E.New("Empty input")
@@ -68,7 +69,6 @@ func ParseIntRange(str string) ([]int, error) {
 		return nil, E.Cause(E.New(fmt.Sprintf("upper bound value (%d) must be greater than or equal to lower bound value (%d)", e, s)), "invalid range")
 	}
 	return []int{int(s), int(e)}, nil
-
 }
 
 // UniformRand generate a uniform random number given the range

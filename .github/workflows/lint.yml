@@ -36,3 +36,4 @@ jobs:
           args: --timeout=30m
           install-mode: binary
           verify: false
+          only-new-issues: true
