@@ -3,9 +3,9 @@
 package include
 
 import (
-	"github.com/tim06/sing-box/adapter/endpoint"
-	"github.com/tim06/sing-box/adapter/outbound"
-	"github.com/tim06/sing-box/protocol/wireguard"
+	"github.com/sagernet/sing-box/adapter/endpoint"
+	"github.com/sagernet/sing-box/adapter/outbound"
+	"github.com/sagernet/sing-box/protocol/wireguard"
 )
 
 func registerWireGuardOutbound(registry *outbound.Registry) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
+	"github.com/sagernet/sing-box/adapter"
+	C "github.com/sagernet/sing-box/constant"
 )
 
 func DTLSRecord(ctx context.Context, metadata *adapter.InboundContext, packet []byte) error {

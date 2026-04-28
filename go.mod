@@ -1,4 +1,4 @@
-module github.com/tim06/sing-box
+module github.com/sagernet/sing-box
 
 go 1.23.1
 

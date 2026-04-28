@@ -3,9 +3,9 @@ package rule
 import (
 	"context"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/adapter"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/service"

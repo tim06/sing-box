@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/bufio"
 	F "github.com/sagernet/sing/common/format"

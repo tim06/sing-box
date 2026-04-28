@@ -3,7 +3,7 @@ package ssmapi
 import (
 	"sync"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter"
 	E "github.com/sagernet/sing/common/exceptions"
 )
 

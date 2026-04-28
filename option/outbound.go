@@ -3,8 +3,8 @@ package option
 import (
 	"context"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/experimental/deprecated"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/experimental/deprecated"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/json"
 	"github.com/sagernet/sing/common/json/badjson"

@@ -3,7 +3,7 @@ package rule
 import (
 	"strings"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing/common/domain"
 	E "github.com/sagernet/sing/common/exceptions"
 )

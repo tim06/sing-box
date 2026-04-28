@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tim06/sing-box/adapter"
-	"github.com/tim06/sing-box/common/tls"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/common/tls"
+	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"

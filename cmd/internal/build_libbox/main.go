@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	_ "github.com/sagernet/gomobile"
+	"github.com/sagernet/sing-box/cmd/internal/build_shared"
+	"github.com/sagernet/sing-box/log"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/rw"
 	"github.com/sagernet/sing/common/shell"
-	"github.com/tim06/sing-box/cmd/internal/build_shared"
-	"github.com/tim06/sing-box/log"
 )
 
 var (
@@ -64,14 +64,14 @@ func init() {
 		currentTag = "unknown"
 	}
 	sharedLd := []string{
-		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		"-X github.com/sagernet/sing-box/constant.Version=" + currentTag,
 		"-s -w -buildid=",
 		extLd,
 	}
 	sharedFlags = append(sharedFlags, "-ldflags", strings.Join(sharedLd, " "))
 
 	debugLd := []string{
-		"-X github.com/tim06/sing-box/constant.Version=" + currentTag,
+		"-X github.com/sagernet/sing-box/constant.Version=" + currentTag,
 		extLd,
 	}
 	debugFlags = append(debugFlags, "-ldflags", strings.Join(debugLd, " "))

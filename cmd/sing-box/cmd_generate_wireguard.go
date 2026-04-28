@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 
-	"github.com/tim06/sing-box/log"
+	"github.com/sagernet/sing-box/log"
 
 	"github.com/spf13/cobra"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"

@@ -5,11 +5,11 @@ import (
 	"net/netip"
 	"os"
 
-	"github.com/tim06/sing-box/adapter"
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/dns"
-	"github.com/tim06/sing-box/log"
-	"github.com/tim06/sing-box/option"
+	"github.com/sagernet/sing-box/adapter"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/dns"
+	"github.com/sagernet/sing-box/log"
+	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/service/filemanager"
 
 	mDNS "github.com/miekg/dns"

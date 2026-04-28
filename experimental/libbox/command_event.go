@@ -8,8 +8,8 @@ import (
 )
 
 const (
-    eventTypeEmpty   = 0
-    eventTypeOpenURL = 1
+	eventTypeEmpty   = 0
+	eventTypeOpenURL = 1
 )
 
 type myEvent interface {

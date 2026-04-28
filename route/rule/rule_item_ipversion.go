@@ -1,7 +1,7 @@
 package rule
 
 import (
-	"github.com/tim06/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter"
 )
 
 var _ RuleItem = (*IPVersionItem)(nil)

@@ -3,7 +3,7 @@ package sniff
 import (
 	"crypto/tls"
 
-	"github.com/tim06/sing-box/common/ja3"
+	"github.com/sagernet/sing-box/common/ja3"
 )
 
 // Chromium sends separate client hello packets, but UQUIC has not yet implemented this behavior

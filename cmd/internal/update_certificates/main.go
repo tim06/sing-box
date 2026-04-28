@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tim06/sing-box/log"
+	"github.com/sagernet/sing-box/log"
 
 	"golang.org/x/exp/slices"
 )

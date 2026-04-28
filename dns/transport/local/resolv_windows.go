@@ -9,7 +9,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/tim06/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing/service"
 
 	"golang.org/x/sys/windows"

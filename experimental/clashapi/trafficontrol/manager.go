@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/experimental/clashapi/compatible"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/experimental/clashapi/compatible"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/json"
 	"github.com/sagernet/sing/common/x/list"

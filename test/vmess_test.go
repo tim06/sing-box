@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	C "github.com/tim06/sing-box/constant"
-	"github.com/tim06/sing-box/option"
+	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/json/badoption"
 

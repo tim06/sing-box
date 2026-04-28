@@ -3,7 +3,7 @@ package libbox
 import (
 	"sync"
 
-	"github.com/tim06/sing-box/experimental/deprecated"
+	"github.com/sagernet/sing-box/experimental/deprecated"
 	"github.com/sagernet/sing/common"
 )
 
