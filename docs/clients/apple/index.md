@@ -38,4 +38,4 @@ brew install sfm
 
 ## :material-source-repository: Source code
 
-* [GitHub](https://github.com/securedproxy/sing-box-for-apple)
+* [GitHub](https://github.com/sagernet/sing-box-for-apple)

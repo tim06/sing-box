@@ -20,4 +20,4 @@ platform-specific function implementation, such as TUN transparent proxy impleme
 
 ## :material-source-repository: Source code
 
-* [GitHub](https://github.com/securedproxy/sing-box-for-android)
+* [GitHub](https://github.com/sagernet/sing-box-for-android)
